@@ -79,7 +79,8 @@ Dokumentdaten wurden nicht uebernommen.
 - Sicherheitsrichtlinie: `SECURITY.md`;
 - Drittanbieter- und Asset-Anleitung: `THIRD_PARTY_ASSETS.md`;
 - synthetischer Einstieg: `examples/synthetic/README.md`;
-- private GitHub-Vorbereitung ohne Runtime-, Modell- oder Nutzdatendateien.
+- private GitHub-Veroeffentlichung ohne Runtime-, Modell- oder
+  Nutzdatendateien.
 
 ## Aktuelle Grenzen
 
@@ -95,11 +96,10 @@ Dokumentdaten wurden nicht uebernommen.
 
 ## Naechste Schritte
 
-1. privaten GitHub-Stand mit dem geprueften Quellbaum abschliessen;
-2. README fuer Erstinstallation und Nutzung weiter verdichten;
-3. Issue-/Pull-Request-Vorlagen und eine lokale CI-Pruefung ergaenzen;
-4. physischen Portabilitaets-Smoke-Test durchfuehren;
-5. v0.1-Release erst nach abgeschlossenem Sicherheits- und Lizenzabgleich
+1. README fuer Erstinstallation und Nutzung weiter verdichten;
+2. Issue-/Pull-Request-Vorlagen und eine lokale CI-Pruefung ergaenzen;
+3. physischen Portabilitaets-Smoke-Test durchfuehren;
+4. v0.1-Release erst nach abgeschlossenem Sicherheits- und Lizenzabgleich
    veroeffentlichen.
 
 ## Letzter abgeschlossener Entwicklungsschritt
@@ -111,3 +111,7 @@ relative Zielpfade und Verifikationsschritte. Zwei synthetische Beispieldateien
 zeigen, wie Nutzer Tabellen und Dokumente ueber den lokalen Dateidialog testen,
 ohne eigene Daten in das Projekt zu kopieren. Anschliessend liefen erneut alle
 218 synthetischen Tests sowie `start.bat --check` erfolgreich.
+
+Der gepruefte Quellbaum wurde anschliessend auf dem Standardbranch `main` des
+privaten GitHub-Repositories veroeffentlicht. Runtime, Modell, persistentes
+Memory, temporaere Sitzungen, Nutzdaten und Python-Caches sind nicht enthalten.
