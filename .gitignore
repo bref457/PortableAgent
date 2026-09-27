@@ -1,0 +1,38 @@
+# Python build and cache artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+build/
+dist/
+.venv/
+venv/
+
+# Local secrets and machine-specific settings
+.env
+.env.*
+!.env.example
+*.local.json
+
+# Portable local runtimes and model weights
+/runtime/
+/models/
+*.gguf
+
+# Persistent memory, temporary sessions and user data
+/data/
+/sessions/
+/user_data/
+*.sqlite
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+*.db
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
