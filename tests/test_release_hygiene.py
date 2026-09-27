@@ -36,6 +36,13 @@ class ReleaseHygieneTests(unittest.TestCase):
             "LICENSE",
             "SECURITY.md",
             "THIRD_PARTY_ASSETS.md",
+            "CONTRIBUTING.md",
+            ".github/workflows/tests.yml",
+            ".github/dependabot.yml",
+            ".github/ISSUE_TEMPLATE/bug_report.yml",
+            ".github/ISSUE_TEMPLATE/feature_request.yml",
+            ".github/ISSUE_TEMPLATE/config.yml",
+            ".github/pull_request_template.md",
             ".env.example",
         )
 
@@ -102,3 +109,4 @@ class ReleaseHygieneTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

@@ -79,6 +79,9 @@ Dokumentdaten wurden nicht uebernommen.
 - Sicherheitsrichtlinie: `SECURITY.md`;
 - Drittanbieter- und Asset-Anleitung: `THIRD_PARTY_ASSETS.md`;
 - synthetischer Einstieg: `examples/synthetic/README.md`;
+- Beitragsrichtlinie sowie Issue- und Pull-Request-Vorlagen;
+- GitHub Actions fuer synthetische Tests unter Python 3.11 und 3.13;
+- woechentliche Dependabot-Pruefung fuer Python- und Actions-Abhaengigkeiten;
 - oeffentliche GitHub-Veroeffentlichung ohne Runtime-, Modell- oder
   Nutzdatendateien.
 
@@ -96,22 +99,26 @@ Dokumentdaten wurden nicht uebernommen.
 
 ## Naechste Schritte
 
-1. README fuer Erstinstallation und Nutzung weiter verdichten;
-2. Issue-/Pull-Request-Vorlagen und eine lokale CI-Pruefung ergaenzen;
-3. physischen Portabilitaets-Smoke-Test durchfuehren;
+1. physischen Portabilitaets-Smoke-Test durchfuehren;
+2. GitHub-Repository-Metadaten und Branch-Schutz nach erster erfolgreicher
+   CI-Ausfuehrung konfigurieren;
+3. private Vulnerability-Reporting-Funktion in GitHub pruefen;
 4. v0.1-Release erst nach abgeschlossenem Sicherheits- und Lizenzabgleich
    veroeffentlichen.
 
 ## Letzter abgeschlossener Entwicklungsschritt
 
-Die oeffentliche Projektdokumentation wurde datensparsam vorbereitet:
-geraetespezifische Hardwareangaben und interne Bereitstellungshistorie wurden
-entfernt, die Drittanbieteranleitung beschreibt stattdessen reproduzierbare
-relative Zielpfade und Verifikationsschritte. Zwei synthetische Beispieldateien
-zeigen, wie Nutzer Tabellen und Dokumente ueber den lokalen Dateidialog testen,
-ohne eigene Daten in das Projekt zu kopieren. Anschliessend liefen erneut alle
-218 synthetischen Tests sowie `start.bat --check` erfolgreich.
+Die oeffentliche Repository-Basis wurde vervollstaendigt: Die README fuehrt
+kompakt von den Projektgrenzen ueber den Windows-Schnellstart bis zur Auswahl
+eigener Dateien. Geraetespezifische Referenzpfade wurden aus der oeffentlichen
+Dokumentation entfernt. `CONTRIBUTING.md`, strukturierte Issue-Vorlagen und eine
+Pull-Request-Checkliste verhindern insbesondere das versehentliche Hochladen
+echter Nutzdaten. Paket-Metadaten enthalten nun Projektlinks, Status,
+Python-Versionen und Suchbegriffe.
 
-Der gepruefte Quellbaum wurde anschliessend auf dem Standardbranch `main` des
-oeffentlichen GitHub-Repositories veroeffentlicht. Runtime, Modell, persistentes
-Memory, temporaere Sitzungen, Nutzdaten und Python-Caches sind nicht enthalten.
+GitHub Actions prueft die synthetische Testsuite unter Python 3.11 und 3.13;
+Dependabot beobachtet Python- und Workflow-Abhaengigkeiten. Lokal liefen alle
+218 synthetischen Tests sowie `start.bat --check` erfolgreich. Runtime, Modell,
+persistentes Memory, temporaere Sitzungen, Nutzdaten und Python-Caches bleiben
+von Git ausgeschlossen.
+

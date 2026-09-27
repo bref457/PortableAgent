@@ -6,8 +6,19 @@ build-backend = "setuptools.build_meta"
 name = "portable-agent"
 version = "0.1.0.dev0"
 description = "Portable offline-first agent for local document analysis"
+readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
+keywords = ["offline", "local-ai", "llama-cpp", "document-analysis", "privacy"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
 dependencies = [
     "openpyxl>=3.1,<4",
     "pypdf>=5,<7",
@@ -15,6 +26,12 @@ dependencies = [
 
 [project.scripts]
 portable-agent = "portable_agent.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/bref457/PortableAgent"
+Repository = "https://github.com/bref457/PortableAgent"
+Issues = "https://github.com/bref457/PortableAgent/issues"
+Security = "https://github.com/bref457/PortableAgent/security/policy"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
@@ -24,3 +41,4 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "portable_agent.web" = ["static/*.html", "static/*.css", "static/*.js"]
+

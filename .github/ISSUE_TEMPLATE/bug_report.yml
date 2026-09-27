@@ -1,0 +1,53 @@
+name: Fehler melden
+description: Reproduzierbares Fehlverhalten ohne sensible Daten melden
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Keine echten Dokumente, Tabellen, Zugangsdaten, Modelle oder Datenbanken anhaengen. Sicherheitsluecken bitte vertraulich gemaess SECURITY.md melden.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Vorabpruefung
+      options:
+        - label: Ich verwende nur synthetische Beispieldaten.
+          required: true
+        - label: Es handelt sich nicht um eine vertraulich zu meldende Sicherheitsluecke.
+          required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Fehlerbeschreibung
+      description: Was ist passiert und was wurde erwartet?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduktion
+      description: Bitte mit synthetischen Daten und genauen Schritten beschreiben.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version oder Commit
+      placeholder: z. B. main oder Commit-ID
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Umgebung
+      placeholder: z. B. Windows 11, Python 3.13
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Bereinigte Fehlermeldung
+      description: Keine Pfade, Nutzdaten, Zugangsdaten oder andere sensible Inhalte einfuegen.
+      render: text
+

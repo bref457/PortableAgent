@@ -5,9 +5,10 @@ Unterordner.
 
 ## Projektgrenzen
 
-- `D:\PortableLLM` ist ausschliesslich ein Referenz-/Quellprojekt.
-- Im Referenzprojekt duerfen nur Quellcode, technische Konfigurationen und
-  technische Dokumentation gelesen werden.
+- Ein gegebenenfalls lokal vorhandenes Vorgaengerprojekt ist ausschliesslich
+  ein externes Referenz-/Quellprojekt.
+- In einem solchen Referenzprojekt duerfen nur Quellcode, technische
+  Konfigurationen und technische Dokumentation gelesen werden.
 - Im Referenzprojekt niemals Dateien anlegen, veraendern, verschieben,
   umbenennen oder loeschen.
 - Neue Architektur, Tests und Dokumentation gehoeren ausschliesslich in dieses
@@ -48,5 +49,6 @@ Unterordner.
   ueberschreiben.
 - Neue Abhaengigkeiten muessen offline installierbar dokumentiert und fuer den
   Kernbetrieb notwendig sein.
-- Tests duerfen nicht still auf Dateien aus `D:\PortableLLM` zugreifen.
+- Tests duerfen nicht still auf Dateien aus externen Referenzprojekten
+  zugreifen.
 

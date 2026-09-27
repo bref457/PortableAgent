@@ -1,0 +1,6 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Sicherheitsproblem vertraulich melden
+    url: https://github.com/bref457/PortableAgent/security/advisories/new
+    about: Keine Sicherheitsluecken oder sensiblen Daten in oeffentlichen Issues veroeffentlichen.
+

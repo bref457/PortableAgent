@@ -1,0 +1,34 @@
+name: Funktion vorschlagen
+description: Eine neue lokale und datensparsame Funktion vorschlagen
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Ausgangslage
+      description: Welches Problem soll geloest werden?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Vorschlag
+      description: Wie sollte die Funktion aus Sicht des Nutzers arbeiten?
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Projektgrenzen
+      options:
+        - label: Der Vorschlag benoetigt keine Cloud-LLMs, Telemetrie oder Cloud-Fallbacks.
+          required: true
+        - label: Beispiele und Testdaten koennen vollstaendig synthetisch sein.
+          required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativen
+      description: Welche anderen Loesungen wurden erwogen?
+
