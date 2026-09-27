@@ -25,7 +25,7 @@ jobs:
       - name: Repository auschecken
         uses: actions/checkout@v4
       - name: Python einrichten
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
