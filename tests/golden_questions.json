@@ -1,0 +1,20 @@
+[
+  {"question": "Wie lange war die Einsatzdauer bei Influentia im Jahre 2026?", "kind": "clarification"},
+  {"question": "Wie hoch war die gesamte Einsatzdauer bei Influentia 2026?", "kind": "plan", "calculation": "sum", "column": "Einsatzdauer"},
+  {"question": "Wie hoch war die durchschnittliche Einsatzdauer bei Influentia 2026?", "kind": "plan", "calculation": "average", "column": "Einsatzdauer"},
+  {"question": "Was war die laengste Einsatzdauer bei Influentia 2026?", "kind": "plan", "calculation": "max", "column": "Einsatzdauer"},
+  {"question": "Was war die kuerzeste Einsatzdauer bei Influentia 2026?", "kind": "plan", "calculation": "min", "column": "Einsatzdauer"},
+  {"question": "Wie viele FIX waren 2026 bei Influentia im Einsatz?", "kind": "plan", "calculation": "sum", "column": "FIX"},
+  {"question": "Wie viele SF Mitarbeiter waren 2026 bei Influentia im Einsatz?", "kind": "plan", "calculation": "sum", "column": "FIX"},
+  {"question": "Wie viele Miliz waren 2026 bei Influentia im Einsatz?", "kind": "plan", "calculation": "sum", "column": "Miliz"},
+  {"question": "Wie viele Miliz und FIX waren am 08.09.2026 im Einsatz?", "kind": "multi_plan", "columns": ["Miliz", "FIX"]},
+  {"question": "Wie viele Miliz pro Aktion im Jahr 2026?", "kind": "group_plan", "group_by": "Aktion", "calculation": "sum", "column": "Miliz"},
+  {"question": "Top 2 Aktionen mit den meisten Einsatzstunden 2026", "kind": "rank_plan", "group_by": "Aktion", "calculation": "sum", "column": "Einsatzstunden", "limit": 2},
+  {"question": "Welche Aktion hatte 2026 die meisten Einsatzstunden?", "kind": "rank_plan", "group_by": "Aktion", "calculation": "sum", "column": "Einsatzstunden", "limit": 1},
+  {"question": "Zeige pro Monat die Einsatzstunden fuer Influentia 2026", "kind": "date_group_plan", "date_part": "month", "calculation": "sum", "column": "Einsatzstunden"},
+  {"question": "Wie viele Eintraege gibt es insgesamt?", "kind": "legacy_plan", "aggregation": "count"},
+  {"question": "Welche Aktionen gibt es?", "kind": "legacy_plan", "aggregation": "distinct", "column": "Aktion"},
+  {"question": "Zeige die Eintraege fuer Influentia", "kind": "legacy_plan", "aggregation": "list"},
+  {"question": "Wie viele Einsatzstunden gab es 2026?", "kind": "plan", "calculation": "sum", "column": "Einsatzstunden"}
+]
+

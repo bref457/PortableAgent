@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>PortableAgent · Lokale Dateianalyse</title>
+  <link rel="stylesheet" href="/assets/app.css">
+  <link rel="stylesheet" href="/assets/modes.css">
+  <script src="/assets/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#workspace">Zum Arbeitsbereich</a>
+  <header class="masthead">
+    <div class="brand" aria-label="PortableAgent">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <div><strong>PortableAgent</strong><span>Lokale Dateianalyse</span></div>
+    </div>
+    <div class="header-badges">
+      <button id="asset-status" class="model-badge checking" type="button" title="Lokale KI-Dateien erneut prüfen">
+        <span aria-hidden="true"></span><span id="asset-status-text">KI-Dateien werden geprüft</span>
+      </button>
+      <button id="model-status" class="model-badge checking" type="button" title="Modellstatus erneut prüfen">
+        <span aria-hidden="true"></span><span id="model-status-text">Modell wird geprüft</span>
+      </button>
+      <div class="privacy-badge"><span aria-hidden="true"></span>Nur auf diesem Gerät</div>
+      <button id="shutdown-button" class="shutdown-button" type="button" title="PortableAgent kontrolliert beenden">PortableAgent beenden</button>
+    </div>
+  </header>
+
+  <main id="workspace" class="workspace">
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">Offline-first · Keine Telemetrie</p>
+      <h1 id="page-title">Frage deine Dateien.<br><em>Die Belege bleiben sichtbar.</em></h1>
+      <p class="lede">Dokumente und Tabellen werden lokal gelesen. Es gibt keine Cloud-Übertragung und keine automatische Dateisuche.</p>
+    </section>
+
+    <nav class="mode-switch" aria-label="Analysemodus" role="tablist">
+      <button id="document-tab" class="mode-button active" type="button" role="tab" aria-selected="true" aria-controls="document-mode">Dokumente</button>
+      <button id="table-tab" class="mode-button" type="button" role="tab" aria-selected="false" aria-controls="table-mode">Tabellen</button>
+      <button id="memory-tab" class="mode-button" type="button" role="tab" aria-selected="false" aria-controls="memory-mode">Memory</button>
+    </nav>
+
+    <div id="document-mode" class="mode-grid" role="tabpanel" aria-labelledby="document-tab">
+    <section class="panel import-panel" aria-labelledby="import-title">
+      <div class="section-heading"><span>01</span><div><h2 id="import-title">Dokument öffnen</h2><p>Wähle eine lokale Datei aus und öffne sie direkt.</p></div></div>
+      <form id="import-form">
+        <input id="document-file" class="visually-hidden" name="document" type="file" accept=".txt,.docx,.pdf">
+        <button id="select-document" class="button-primary document-picker" type="button" aria-describedby="document-file-note">Datei auswählen und öffnen</button>
+        <p id="document-file-note" class="field-note">TXT, DOCX oder PDF · Die Datei bleibt auf diesem Gerät. Eine kurzlebige lokale Arbeitskopie wird nach dem Einlesen sofort entfernt.</p>
+      </form>
+    </section>
+
+    <section class="panel sessions-panel" aria-labelledby="sessions-title">
+      <div class="section-heading"><span>02</span><div><h2 id="sessions-title">Temporäre Sitzung</h2><p>Wähle und verwalte lokal geöffnete Dokumente.</p></div></div>
+      <div class="session-controls">
+        <label for="session-select">Aktives Dokument</label>
+        <select id="session-select"><option value="">Noch kein Dokument geöffnet</option></select>
+        <div class="button-row">
+          <button id="refresh-sessions" class="button-secondary" type="button">Aktualisieren</button>
+          <button id="release-session" class="button-danger" type="button" disabled>Freigeben</button>
+          <button id="release-all" class="button-quiet" type="button" disabled>Alle freigeben</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel question-panel" aria-labelledby="question-title">
+      <div class="section-heading"><span>03</span><div><h2 id="question-title">Belegte Frage</h2><p>Nur gefundene Fundstellen gelangen an das lokale Modell.</p></div></div>
+      <form id="question-form">
+        <label for="question">Deine Frage</label>
+        <textarea id="question" rows="4" placeholder="Welche Frist wird im Dokument genannt?" required disabled></textarea>
+        <button id="ask-button" class="button-primary" type="submit" disabled>Mit Belegen beantworten</button>
+      </form>
+    </section>
+
+    <section class="panel result-panel" aria-labelledby="answer-title">
+      <div class="section-heading"><span>04</span><div><h2 id="answer-title">Antwort &amp; Quellen</h2><p>Jede Antwort bleibt an die verwendeten Fundstellen gebunden.</p></div></div>
+      <div id="answer-empty" class="empty-state"><span aria-hidden="true">⌁</span><p>Hier erscheint die lokal erzeugte Antwort.</p></div>
+      <article id="answer-card" class="answer-card" hidden>
+        <p id="answer-text"></p>
+        <div class="citation-heading"><h3>Verwendete Fundstellen</h3><span id="match-count"></span></div>
+        <ol id="citations" class="citations"></ol>
+      </article>
+    </section>
+    </div>
+
+    <div id="table-mode" class="mode-grid table-mode" role="tabpanel" aria-labelledby="table-tab" hidden>
+      <section class="panel table-query-panel" aria-labelledby="table-query-title">
+        <div class="section-heading"><span>T1</span><div><h2 id="table-query-title">Tabelle befragen</h2><p>CSV, XLSX oder XLSM werden für genau diese Anfrage read-only geöffnet.</p></div></div>
+        <form id="table-form">
+          <input id="table-file" class="visually-hidden" name="table" type="file" accept=".csv,.xlsx,.xlsm">
+          <button id="select-table" class="button-secondary table-picker" type="button" aria-describedby="table-file-note">Tabelle auswählen</button>
+          <p id="selected-table-name" class="selected-file" role="status">Noch keine Tabelle ausgewählt</p>
+          <div id="sheet-field" class="sheet-field" hidden>
+            <label for="sheet-name">Tabellenblatt</label>
+            <select id="sheet-name" name="sheet_name" disabled><option value="">Zuerst eine Excel-Datei auswählen</option></select>
+          </div>
+          <label for="table-question">Deine Frage</label>
+          <textarea id="table-question" rows="4" placeholder="Wie viele FIX-Mitarbeiter gibt es insgesamt?" required></textarea>
+          <button id="table-ask-button" class="button-primary" type="submit" disabled>Lokal berechnen</button>
+          <p id="table-file-note" class="field-note">Die Tabelle bleibt auf diesem Gerät. Bei Excel wählst Du einen Reiter; CSV benötigt keine Blattauswahl. Nur Spaltennamen und freigegebene Felddefinitionen gelangen an das lokale Modell.</p>
+        </form>
+      </section>
+
+      <section class="panel table-result-panel" aria-labelledby="table-result-title">
+        <div class="section-heading"><span>T2</span><div><h2 id="table-result-title">Ergebnis &amp; Zeilenbelege</h2><p>Die Quelldatei bleibt unverändert und wird nicht in einer Sitzung gehalten.</p></div></div>
+        <div id="table-empty" class="empty-state"><span aria-hidden="true">∑</span><p>Hier erscheint das lokal berechnete Ergebnis.</p></div>
+        <article id="table-result-card" class="answer-card" hidden>
+          <div id="table-result-content"></div>
+          <div class="citation-heading"><h3 id="table-citation-title">Verwendete Zeilen</h3><span id="table-match-count"></span></div>
+          <ol id="table-citations" class="citations"></ol>
+        </article>
+      </section>
+    </div>
+
+    <div id="memory-mode" class="mode-grid memory-mode" role="tabpanel" aria-labelledby="memory-tab" hidden>
+      <section class="panel memory-write-panel" aria-labelledby="memory-write-title">
+        <div class="section-heading"><span>M1</span><div><h2 id="memory-write-title">Wissensnotiz speichern</h2><p>Nur kurze Informationen, die Du ausdrücklich dauerhaft behalten möchtest.</p></div></div>
+        <form id="memory-form">
+          <label for="memory-text">Neue Wissensnotiz</label>
+          <textarea id="memory-text" rows="5" maxlength="4000" placeholder="Zum Beispiel: FIX bedeutet in meinen Tabellen fest angestellt." required></textarea>
+          <label class="memory-confirmation" for="memory-confirmation">
+            <input id="memory-confirmation" type="checkbox">
+            <span>Ich bestätige, dass diese Notiz dauerhaft lokal gespeichert werden darf.</span>
+          </label>
+          <button id="memory-save-button" class="button-primary" type="submit" disabled>Bestätigt speichern</button>
+          <p class="field-note">Dokumente, Dateiinhalte und Chatverläufe werden niemals automatisch übernommen.</p>
+        </form>
+      </section>
+
+      <section class="panel memory-list-panel" aria-labelledby="memory-list-title">
+        <div class="section-heading"><span>M2</span><div><h2 id="memory-list-title">Gespeichertes Wissen</h2><p>Jede Löschung benötigt eine separate Bestätigung.</p></div></div>
+        <div class="button-row memory-actions">
+          <button id="refresh-memory" class="button-secondary" type="button">Aktualisieren</button>
+        </div>
+        <div id="memory-empty" class="empty-state"><span aria-hidden="true">◇</span><p>Noch keine bestätigten Wissensnotizen gespeichert.</p></div>
+        <ol id="memory-list" class="memory-list" hidden></ol>
+      </section>
+    </div>
+  </main>
+
+  <footer><span>PortableAgent v0.1</span><span>Lokaler Speicher · Explizite Freigabe</span></footer>
+  <div id="status" class="status" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "description": "Quellenunabhaengige fachliche Definitionen fuer tabellarische und spaetere Dokumentextraktoren.",
+  "fields": [
+    {
+      "canonical_name": "Aktion",
+      "aliases": ["Aktion", "Aktionsname", "Fall", "Einsatz", "Bezeichnung"],
+      "role": "dimension",
+      "data_type": "text",
+      "description": "Name der Aktion beziehungsweise des Einsatzfalls",
+      "allowed_operations": ["filter", "group", "distinct", "count"]
+    },
+    {
+      "canonical_name": "Datum",
+      "aliases": ["Datum", "Date", "Einsatzdatum", "Tag"],
+      "role": "dimension",
+      "data_type": "date",
+      "description": "Kalendertag des Eintrags",
+      "allowed_operations": ["filter", "group", "min", "max"]
+    },
+    {
+      "canonical_name": "FIX",
+      "aliases": ["FIX", "Fix", "SF Mitarbeiter", "SF-Mitarbeiter", "Festangestellte"],
+      "role": "measure",
+      "data_type": "number",
+      "description": "Anzahl festangestellter SF-Mitarbeiter pro Eintrag",
+      "unit": "Personen",
+      "allowed_aggregations": ["sum", "average", "min", "max"],
+      "default_aggregation": "sum",
+      "clarify_on_multiple": false,
+      "non_negative": true
+    },
+    {
+      "canonical_name": "Miliz",
+      "aliases": ["Miliz", "Milizmitarbeiter", "Miliz-Mitarbeiter"],
+      "role": "measure",
+      "data_type": "number",
+      "description": "Anzahl Milizmitarbeiter pro Eintrag",
+      "unit": "Personen",
+      "allowed_aggregations": ["sum", "average", "min", "max"],
+      "default_aggregation": "sum",
+      "clarify_on_multiple": false,
+      "non_negative": true
+    },
+    {
+      "canonical_name": "Einsatzdauer",
+      "aliases": ["Einsatzdauer", "Dauer", "wie lange"],
+      "role": "measure",
+      "data_type": "duration",
+      "description": "Zeitspanne eines einzelnen Einsatzes von Beginn bis Ende",
+      "unit": "Stunden",
+      "allowed_aggregations": ["sum", "average", "min", "max"],
+      "default_aggregation": null,
+      "clarify_on_multiple": true,
+      "non_negative": true
+    },
+    {
+      "canonical_name": "Einsatzstunden",
+      "aliases": ["Einsatzstunden", "Stunden", "Arbeitsstunden", "Personalstunden", "Aufwand"],
+      "role": "measure",
+      "data_type": "duration",
+      "description": "Gesamter personeller Stundenaufwand des Eintrags",
+      "unit": "Stunden",
+      "allowed_aggregations": ["sum", "average", "min", "max"],
+      "default_aggregation": "sum",
+      "clarify_on_multiple": false,
+      "non_negative": true
+    },
+    {
+      "canonical_name": "Ueberzeit_Marker",
+      "aliases": ["UZ", "ÜZ"],
+      "role": "text",
+      "data_type": "text",
+      "description": "Historische Hilfs- oder Markierungsspalte; nicht direkt berechnen",
+      "allowed_operations": ["filter", "list"]
+    },
+    {
+      "canonical_name": "Ueberzeit",
+      "aliases": ["Ueberzeit", "Überzeit"],
+      "role": "measure",
+      "data_type": "duration",
+      "description": "Erfasste Ueberzeit",
+      "unit": "Stunden",
+      "allowed_aggregations": ["sum", "average", "min", "max"],
+      "default_aggregation": "sum",
+      "clarify_on_multiple": false,
+      "non_negative": true
+    },
+    {
+      "canonical_name": "Besonderes",
+      "aliases": ["Besonderes", "Bemerkung", "Bemerkungen", "Notiz", "Notizen"],
+      "role": "text",
+      "data_type": "text",
+      "description": "Freitext mit besonderen Hinweisen",
+      "allowed_operations": ["filter", "list"]
+    },
+    {
+      "canonical_name": "Problem",
+      "aliases": ["Problem", "Probleme", "Stoerung", "Störung"],
+      "role": "text",
+      "data_type": "text",
+      "description": "Freitext zu aufgetretenen Problemen",
+      "allowed_operations": ["filter", "list"]
+    }
+  ]
+}
+

@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "portable-agent"
+version = "0.1.0.dev0"
+description = "Portable offline-first agent for local document analysis"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+dependencies = [
+    "openpyxl>=3.1,<4",
+    "pypdf>=5,<7",
+]
+
+[project.scripts]
+portable-agent = "portable_agent.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"portable_agent.web" = ["static/*.html", "static/*.css", "static/*.js"]
