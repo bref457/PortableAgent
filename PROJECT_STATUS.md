@@ -79,7 +79,7 @@ Dokumentdaten wurden nicht uebernommen.
 - Sicherheitsrichtlinie: `SECURITY.md`;
 - Drittanbieter- und Asset-Anleitung: `THIRD_PARTY_ASSETS.md`;
 - synthetischer Einstieg: `examples/synthetic/README.md`;
-- private GitHub-Veroeffentlichung ohne Runtime-, Modell- oder
+- oeffentliche GitHub-Veroeffentlichung ohne Runtime-, Modell- oder
   Nutzdatendateien.
 
 ## Aktuelle Grenzen
@@ -113,5 +113,5 @@ ohne eigene Daten in das Projekt zu kopieren. Anschliessend liefen erneut alle
 218 synthetischen Tests sowie `start.bat --check` erfolgreich.
 
 Der gepruefte Quellbaum wurde anschliessend auf dem Standardbranch `main` des
-privaten GitHub-Repositories veroeffentlicht. Runtime, Modell, persistentes
+oeffentlichen GitHub-Repositories veroeffentlicht. Runtime, Modell, persistentes
 Memory, temporaere Sitzungen, Nutzdaten und Python-Caches sind nicht enthalten.
