@@ -75,7 +75,10 @@ fuer Beitraege stehen in [CONTRIBUTING.md](CONTRIBUTING.md).
 Coding Agents verwenden [AGENTS.md](AGENTS.md) als gemeinsame Regelquelle.
 [CLAUDE.md](CLAUDE.md) importiert dieselben Regeln fuer Claude Code, damit
 Projektstand, Sicherheitsgrenzen und die Kurzkommandos `update dich` und
-`save` bei einem Werkzeugwechsel erhalten bleiben.
+`save` bei einem Werkzeugwechsel erhalten bleiben. Die dort definierte
+bidirektionale Uebergabe verpflichtet Codex und Claude Code, materielle
+Fortschritte vor dem Wechsel in denselben versionierten Status-, Planungs- und
+Architekturdateien festzuhalten.
 
 ## Projektstruktur
 
