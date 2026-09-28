@@ -8,6 +8,7 @@ from portable_agent.analysis import execute_table_plan
 from portable_agent.domain import ClarificationRequest, QueryResult
 from portable_agent.semantics import (
     SemanticCatalog,
+    attach_result_semantics,
     load_default_semantic_catalog,
     resolve_clarification,
 )
@@ -54,4 +55,9 @@ class TableAgent:
     ) -> QueryResult:
         """Execute a selected clarification option without another LLM call."""
         plan = resolve_clarification(request, option_id)
-        return execute_table_plan(self.source, plan)
+        return attach_result_semantics(
+            execute_table_plan(self.source, plan),
+            plan,
+            self.catalog,
+            tuple(self.source.columns),
+        )

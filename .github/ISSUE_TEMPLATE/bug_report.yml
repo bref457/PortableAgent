@@ -50,4 +50,3 @@ body:
       label: Bereinigte Fehlermeldung
       description: Keine Pfade, Nutzdaten, Zugangsdaten oder andere sensible Inhalte einfuegen.
       render: text
-

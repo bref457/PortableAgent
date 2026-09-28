@@ -9,10 +9,15 @@ const HEALTH_API = "/health";
 const SHUTDOWN_API = "/api/shutdown";
 
 const elements = {
+  appShell: document.querySelector("#app-shell"),
+  sidebarToggle: document.querySelector("#sidebar-toggle"),
+  workspaceLabel: document.querySelector("#workspace-label"),
+  currentContext: document.querySelector("#current-context"),
   documentTab: document.querySelector("#document-tab"),
   tableTab: document.querySelector("#table-tab"),
   memoryTab: document.querySelector("#memory-tab"),
   documentMode: document.querySelector("#document-mode"),
+  documentSplitter: document.querySelector("#document-splitter"),
   tableMode: document.querySelector("#table-mode"),
   memoryMode: document.querySelector("#memory-mode"),
   assetStatus: document.querySelector("#asset-status"),
@@ -43,12 +48,12 @@ const elements = {
   sheetName: document.querySelector("#sheet-name"),
   tableQuestion: document.querySelector("#table-question"),
   tableAsk: document.querySelector("#table-ask-button"),
-  tableEmpty: document.querySelector("#table-empty"),
   tableCard: document.querySelector("#table-result-card"),
   tableContent: document.querySelector("#table-result-content"),
   tableCitationHeading: document.querySelector("#table-citation-title").parentElement,
   tableMatchCount: document.querySelector("#table-match-count"),
   tableCitations: document.querySelector("#table-citations"),
+  tableSplitter: document.querySelector("#table-splitter"),
   memoryForm: document.querySelector("#memory-form"),
   memoryText: document.querySelector("#memory-text"),
   memoryConfirmation: document.querySelector("#memory-confirmation"),
@@ -56,13 +61,18 @@ const elements = {
   memoryRefresh: document.querySelector("#refresh-memory"),
   memoryEmpty: document.querySelector("#memory-empty"),
   memoryList: document.querySelector("#memory-list"),
+  workingOverlay: document.querySelector("#working-overlay"),
+  workingTitle: document.querySelector("#working-title"),
+  workingDetail: document.querySelector("#working-detail"),
   status: document.querySelector("#status"),
 };
 
 let statusTimer;
 let startupPollTimer;
+let workingMessageTimer;
 let shuttingDown = false;
 let selectedTableFile = null;
+let currentMode = "document";
 
 async function api(endpoint, payload) {
   const response = await fetch(endpoint, {
@@ -146,9 +156,9 @@ async function refreshModelStatus() {
     if (!assetsReady) {
       elements.assetStatusText.textContent = "Dateistatus nicht verfügbar";
     } else if (allAssetsAvailable) {
-      elements.assetStatusText.textContent = "Runtime und GGUF-Modell vorhanden";
+      elements.assetStatusText.textContent = "KI-Dateien vorhanden";
     } else if (!runtimeAvailable && !modelAvailable) {
-      elements.assetStatusText.textContent = "Runtime und GGUF-Modell fehlen";
+      elements.assetStatusText.textContent = "KI-Dateien fehlen";
     } else if (!runtimeAvailable) {
       elements.assetStatusText.textContent = "Portable Runtime fehlt";
     } else {
@@ -195,7 +205,32 @@ function setBusy(button, busy, label) {
   button.textContent = busy ? label : button.dataset.label;
 }
 
+function beginWorking(messages) {
+  const queue = Array.isArray(messages) && messages.length
+    ? messages
+    : ["Ich arbeite lokal an deiner Anfrage."];
+  let index = 0;
+  clearInterval(workingMessageTimer);
+  elements.workingTitle.textContent = "Einen Moment …";
+  elements.workingDetail.textContent = queue[index];
+  elements.workingOverlay.hidden = false;
+  document.body.classList.add("working");
+  document.body.setAttribute("aria-busy", "true");
+  workingMessageTimer = setInterval(() => {
+    index = (index + 1) % queue.length;
+    elements.workingDetail.textContent = queue[index];
+  }, 2200);
+}
+
+function endWorking() {
+  clearInterval(workingMessageTimer);
+  elements.workingOverlay.hidden = true;
+  document.body.classList.remove("working");
+  document.body.removeAttribute("aria-busy");
+}
+
 function setMode(mode) {
+  currentMode = mode;
   const modes = [
     ["document", elements.documentTab, elements.documentMode],
     ["table", elements.tableTab, elements.tableMode],
@@ -207,6 +242,24 @@ function setMode(mode) {
     tab.classList.toggle("active", active);
     tab.setAttribute("aria-selected", String(active));
   }
+  updateWorkspaceContext();
+}
+
+function updateWorkspaceContext() {
+  const labels = {document: "Dokumente", table: "Tabellen", memory: "Memory"};
+  elements.workspaceLabel.textContent = labels[currentMode];
+  if (currentMode === "table") {
+    elements.currentContext.textContent = selectedTableFile?.name || "Keine Tabelle ausgewählt";
+    return;
+  }
+  if (currentMode === "memory") {
+    elements.currentContext.textContent = "Lokaler Speicher";
+    return;
+  }
+  const option = elements.sessionSelect.selectedOptions[0];
+  elements.currentContext.textContent = elements.sessionSelect.value && option
+    ? option.textContent
+    : "Kein Dokument ausgewählt";
 }
 
 function updateMemorySaveState() {
@@ -286,6 +339,7 @@ async function refreshSessions(preferredId = "") {
     elements.sessionSelect.value = previous;
   }
   updateControls();
+  updateWorkspaceContext();
 }
 
 function clearAnswer() {
@@ -297,7 +351,6 @@ function clearAnswer() {
 
 function clearTableResult() {
   elements.tableCard.hidden = true;
-  elements.tableEmpty.hidden = false;
   elements.tableContent.replaceChildren();
   elements.tableCitations.replaceChildren();
 }
@@ -336,9 +389,9 @@ function citationLocation(citation) {
   return parts.join(" · ") || "Quellenfundstelle";
 }
 
-function renderCitations(citations, target) {
+function renderCitations(citations, target, columnSemantics = {}, openFirstRow = false) {
   target.replaceChildren();
-  for (const citation of citations) {
+  for (const [index, citation] of citations.entries()) {
     const item = document.createElement("li");
     item.className = "citation";
     const source = document.createElement("strong");
@@ -350,6 +403,27 @@ function renderCitations(citations, target) {
       const excerpt = document.createElement("blockquote");
       excerpt.textContent = citation.excerpt;
       item.append(excerpt);
+    }
+    const rowEntries = citation.row_values && typeof citation.row_values === "object"
+      ? Object.entries(citation.row_values)
+      : [];
+    if (rowEntries.length) {
+      const details = document.createElement("details");
+      details.className = "citation-row-details";
+      details.open = openFirstRow && index === 0;
+      const summary = document.createElement("summary");
+      summary.textContent = "Zeileninhalt";
+      const fields = document.createElement("dl");
+      fields.className = "citation-row-fields";
+      for (const [column, value] of rowEntries) {
+        const term = document.createElement("dt");
+        term.textContent = column;
+        const description = document.createElement("dd");
+        description.textContent = displayValue(value, columnSemantics[column]);
+        fields.append(term, description);
+      }
+      details.append(summary, fields);
+      item.append(details);
     }
     target.append(item);
   }
@@ -363,9 +437,57 @@ function renderAnswer(answer) {
   elements.card.hidden = false;
 }
 
-function displayValue(value) {
+function formatDurationHours(value) {
+  const totalSeconds = Math.round(Math.abs(value) * 3600);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const parts = [];
+  if (hours) parts.push(`${hours} Stunde${hours === 1 ? "" : "n"}`);
+  if (minutes) parts.push(`${minutes} Minute${minutes === 1 ? "" : "n"}`);
+  if (seconds) parts.push(`${seconds} Sekunde${seconds === 1 ? "" : "n"}`);
+  if (!parts.length) parts.push("0 Minuten");
+  return `${value < 0 ? "−" : ""}${parts.join(" ")}`;
+}
+
+function formatClockTime(value) {
+  let totalSeconds;
+  if (typeof value === "number" && Number.isFinite(value)) {
+    if (value < 0 || value > 24) return null;
+    totalSeconds = Math.round(value * 3600);
+  } else if (typeof value === "string") {
+    const match = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(value);
+    if (!match) return null;
+    const hours = Number(match[1]);
+    const minutes = Number(match[2]);
+    const seconds = Number(match[3] || 0);
+    if (hours > 24 || minutes > 59 || seconds > 59) return null;
+    totalSeconds = hours * 3600 + minutes * 60 + seconds;
+  } else {
+    return null;
+  }
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const clock = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  return seconds
+    ? `${clock}:${String(seconds).padStart(2, "0")} Uhr`
+    : `${clock} Uhr`;
+}
+
+function displayValue(value, semantics = null) {
   if (value === null || value === undefined) return "–";
   if (typeof value === "boolean") return value ? "Ja" : "Nein";
+  if (
+    semantics?.data_type === "duration"
+    && semantics?.unit === "Stunden"
+    && typeof value === "number"
+    && Number.isFinite(value)
+  ) return formatDurationHours(value);
+  if (semantics?.data_type === "time") {
+    const clockTime = formatClockTime(value);
+    if (clockTime !== null) return clockTime;
+  }
   if (typeof value === "object") return JSON.stringify(value);
   if (typeof value === "string") {
     const isoDate = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
@@ -374,20 +496,20 @@ function displayValue(value) {
   return String(value);
 }
 
-function renderValueList(values) {
+function renderValueList(values, valueSemantics) {
   const list = document.createElement("dl");
   list.className = "result-values";
   for (const [label, value] of Object.entries(values)) {
     const term = document.createElement("dt");
     term.textContent = label;
     const description = document.createElement("dd");
-    description.textContent = displayValue(value);
+    description.textContent = displayValue(value, valueSemantics[label]);
     list.append(term, description);
   }
   elements.tableContent.append(list);
 }
 
-function renderGroupTable(groups) {
+function renderGroupTable(groups, valueSemantics) {
   const headers = [];
   for (const group of groups) {
     for (const key of Object.keys(group)) {
@@ -412,7 +534,7 @@ function renderGroupTable(groups) {
     const row = document.createElement("tr");
     for (const header of headers) {
       const cell = document.createElement("td");
-      cell.textContent = displayValue(group[header]);
+      cell.textContent = displayValue(group[header], valueSemantics[header]);
       row.append(cell);
     }
     body.append(row);
@@ -451,6 +573,10 @@ function renderClarification(result) {
 async function resolveClarification(clarificationId, optionId) {
   const buttons = elements.tableContent.querySelectorAll(".clarification-option");
   for (const button of buttons) button.disabled = true;
+  beginWorking([
+    "Ich löse deine Auswahl lokal auf.",
+    "Ich berechne das Ergebnis neu.",
+  ]);
   try {
     const response = await tableApi({
       operation: "resolve_table",
@@ -462,6 +588,8 @@ async function resolveClarification(clarificationId, optionId) {
   } catch (error) {
     for (const button of buttons) button.disabled = false;
     showStatus(error.message, true);
+  } finally {
+    endWorking();
   }
 }
 
@@ -473,19 +601,33 @@ function renderTableResult(result) {
     renderClarification(result);
   } else {
     const groups = result.values?.groups;
-    if (Array.isArray(groups)) renderGroupTable(groups);
-    else renderValueList(result.values || {});
-    const matchedRows = result.metadata?.matched_rows ?? result.citations.length;
-    elements.tableMatchCount.textContent = `${matchedRows} verwendete Zeile${matchedRows === 1 ? "" : "n"}`;
-    renderCitations(result.citations, elements.tableCitations);
+    const valueSemantics = result.metadata?.value_semantics || {};
+    if (Array.isArray(groups)) renderGroupTable(groups, valueSemantics);
+    else renderValueList(result.values || {}, valueSemantics);
+    const citedRows = result.citations.length;
+    elements.tableMatchCount.textContent = `${citedRows} verwendete Zeile${citedRows === 1 ? "" : "n"}`;
+    renderCitations(
+      result.citations,
+      elements.tableCitations,
+      result.metadata?.column_semantics || {},
+      true,
+    );
   }
-  elements.tableEmpty.hidden = true;
   elements.tableCard.hidden = false;
 }
 
 elements.documentTab.addEventListener("click", () => setMode("document"));
 elements.tableTab.addEventListener("click", () => setMode("table"));
 elements.memoryTab.addEventListener("click", () => setMode("memory"));
+elements.sidebarToggle.addEventListener("click", () => {
+  const collapsed = elements.appShell.classList.toggle("sidebar-collapsed");
+  elements.sidebarToggle.textContent = collapsed ? "›" : "‹";
+  elements.sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
+  elements.sidebarToggle.setAttribute(
+    "aria-label",
+    collapsed ? "Seitenleiste ausklappen" : "Seitenleiste einklappen",
+  );
+});
 elements.assetStatus.addEventListener("click", () => refreshModelStatus());
 elements.modelStatus.addEventListener("click", () => refreshModelStatus());
 elements.shutdown.addEventListener("click", async () => {
@@ -520,6 +662,44 @@ for (const [index, tab] of modeTabs.entries()) {
   });
 }
 
+function setWorkspaceSplit(mode, splitter, property, percent) {
+  const bounded = Math.min(70, Math.max(34, percent));
+  mode.style.setProperty(property, `${bounded}%`);
+  splitter.setAttribute("aria-valuenow", String(Math.round(bounded)));
+}
+
+function configureWorkspaceSplitter(mode, splitter, property) {
+  const updateFromPointer = (clientX) => {
+    const bounds = mode.getBoundingClientRect();
+    if (!bounds.width) return;
+    setWorkspaceSplit(mode, splitter, property, ((clientX - bounds.left) / bounds.width) * 100);
+  };
+  splitter.addEventListener("pointerdown", (event) => {
+    splitter.setPointerCapture(event.pointerId);
+    splitter.classList.add("dragging");
+    updateFromPointer(event.clientX);
+  });
+  splitter.addEventListener("pointermove", (event) => {
+    if (splitter.hasPointerCapture(event.pointerId)) updateFromPointer(event.clientX);
+  });
+  splitter.addEventListener("pointerup", (event) => {
+    if (splitter.hasPointerCapture(event.pointerId)) splitter.releasePointerCapture(event.pointerId);
+    splitter.classList.remove("dragging");
+  });
+  splitter.addEventListener("keydown", (event) => {
+    const current = Number(splitter.getAttribute("aria-valuenow")) || 52;
+    if (event.key === "ArrowLeft") setWorkspaceSplit(mode, splitter, property, current - 2);
+    else if (event.key === "ArrowRight") setWorkspaceSplit(mode, splitter, property, current + 2);
+    else if (event.key === "Home") setWorkspaceSplit(mode, splitter, property, 34);
+    else if (event.key === "End") setWorkspaceSplit(mode, splitter, property, 70);
+    else return;
+    event.preventDefault();
+  });
+}
+
+configureWorkspaceSplitter(elements.documentMode, elements.documentSplitter, "--document-left-width");
+configureWorkspaceSplitter(elements.tableMode, elements.tableSplitter, "--table-query-width");
+
 elements.selectDocument.addEventListener("click", () => {
   elements.documentFile.value = "";
   elements.documentFile.click();
@@ -529,6 +709,7 @@ elements.documentFile.addEventListener("change", async () => {
   const [file] = elements.documentFile.files;
   if (!file) return;
   setBusy(elements.selectDocument, true, "Wird lokal geöffnet …");
+  beginWorking(["Ich öffne das Dokument lokal.", "Ich bereite die Fundstellen vor."]);
   try {
     const result = await uploadDocument(file);
     await refreshSessions(result.session.session_id);
@@ -538,6 +719,7 @@ elements.documentFile.addEventListener("change", async () => {
   } catch (error) {
     showStatus(error.message, true);
   } finally {
+    endWorking();
     elements.documentFile.value = "";
     setBusy(elements.selectDocument, false, "");
   }
@@ -546,6 +728,11 @@ elements.documentFile.addEventListener("change", async () => {
 elements.questionForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   setBusy(elements.ask, true, "Lokale Analyse …");
+  beginWorking([
+    "Ich recherchiere in deinem Dokument.",
+    "Ich prüfe die passenden Fundstellen.",
+    "Ich formuliere eine belegte Antwort.",
+  ]);
   try {
     const result = await documentApi({
       operation: "ask",
@@ -557,6 +744,7 @@ elements.questionForm.addEventListener("submit", async (event) => {
   } catch (error) {
     showStatus(error.message, true);
   } finally {
+    endWorking();
     setBusy(elements.ask, false, "");
     updateControls();
   }
@@ -575,6 +763,7 @@ elements.tableFile.addEventListener("change", async () => {
     return;
   }
   selectedTableFile = null;
+  updateWorkspaceContext();
   elements.sheetField.hidden = true;
   elements.sheetName.disabled = true;
   elements.selectedTableName.classList.remove("ready");
@@ -582,12 +771,14 @@ elements.tableFile.addEventListener("change", async () => {
   updateTableAskState();
   clearTableResult();
   setBusy(elements.selectTable, true, "Tabelle wird geprüft …");
+  beginWorking(["Ich prüfe die Tabelle lokal.", "Ich lese die Tabellenblätter ein."]);
   try {
     const result = await tableFileApi(file, {
       operation: "list_sheets",
       filename: file.name,
     });
     selectedTableFile = file;
+    updateWorkspaceContext();
     elements.selectedTableName.textContent = file.name;
     elements.selectedTableName.classList.add("ready");
     if (result.file_type === "excel") {
@@ -605,9 +796,12 @@ elements.tableFile.addEventListener("change", async () => {
     }
     elements.selectTable.dataset.label = "Andere Tabelle auswählen";
   } catch (error) {
+    selectedTableFile = null;
+    updateWorkspaceContext();
     elements.selectedTableName.textContent = "Noch keine Tabelle ausgewählt";
     showStatus(error.message, true);
   } finally {
+    endWorking();
     elements.tableFile.value = "";
     setBusy(elements.selectTable, false, "");
     updateTableAskState();
@@ -624,6 +818,11 @@ elements.tableForm.addEventListener("submit", async (event) => {
     return;
   }
   setBusy(elements.tableAsk, true, "Lokale Berechnung …");
+  beginWorking([
+    "Ich analysiere deine Frage.",
+    "Ich recherchiere in den passenden Zeilen.",
+    "Ich berechne das Ergebnis lokal.",
+  ]);
   const metadata = {
     operation: "ask_table",
     filename: selectedTableFile.name,
@@ -641,13 +840,18 @@ elements.tableForm.addEventListener("submit", async (event) => {
     clearTableResult();
     showStatus(error.message, true);
   } finally {
+    endWorking();
     setBusy(elements.tableAsk, false, "");
     updateTableAskState();
   }
 });
 
 elements.refresh.addEventListener("click", () => refreshSessions().catch((error) => showStatus(error.message, true)));
-elements.sessionSelect.addEventListener("change", () => { clearAnswer(); updateControls(); });
+elements.sessionSelect.addEventListener("change", () => {
+  clearAnswer();
+  updateControls();
+  updateWorkspaceContext();
+});
 elements.release.addEventListener("click", async () => {
   try {
     await documentApi({operation: "release", session_id: elements.sessionSelect.value});

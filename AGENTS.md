@@ -51,4 +51,3 @@ Unterordner.
   Kernbetrieb notwendig sein.
 - Tests duerfen nicht still auf Dateien aus externen Referenzprojekten
   zugreifen.
-

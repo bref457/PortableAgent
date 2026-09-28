@@ -101,7 +101,7 @@ def _decode_request(request_json: Any, max_chars: int) -> dict[str, Any]:
         raise TableJsonError("JSON-Request muss eine nicht leere Zeichenkette sein.")
     if len(request_json) > max_chars:
         raise TableJsonError(
-            f"JSON-Request ist groesser als das Limit von {max_chars} Zeichen."
+            f"JSON-Request ist größer als das Limit von {max_chars} Zeichen."
         )
     try:
         payload = json.loads(
@@ -110,7 +110,7 @@ def _decode_request(request_json: Any, max_chars: int) -> dict[str, Any]:
             parse_constant=_reject_nonstandard_constant,
         )
     except json.JSONDecodeError as exc:
-        raise TableJsonError(f"Ungueltiger JSON-Request: {exc.msg}") from exc
+        raise TableJsonError(f"Ungültiger JSON-Request: {exc.msg}") from exc
     if type(payload) is not dict:
         raise TableJsonError("JSON-Request muss ein Objekt sein.")
     return payload
@@ -120,7 +120,7 @@ def _object_without_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     result: dict[str, Any] = {}
     for key, value in pairs:
         if key in result:
-            raise TableJsonError(f"JSON-Request enthaelt doppeltes Feld: {key}")
+            raise TableJsonError(f"JSON-Request enthält doppeltes Feld: {key}")
         result[key] = value
     return result
 
@@ -140,7 +140,7 @@ def _require_fields(
     unknown = sorted(set(request) - allowed)
     if unknown:
         raise TableJsonError(
-            f"{operation} enthaelt unbekannte Felder: {', '.join(unknown)}"
+            f"{operation} enthält unbekannte Felder: {', '.join(unknown)}"
         )
     missing = sorted(required - set(request))
     if missing:
@@ -199,6 +199,7 @@ def _source_ref_dict(source_ref: SourceRef) -> dict[str, Any]:
         "page": source_ref.page,
         "paragraph": source_ref.paragraph,
         "row": source_ref.row,
+        "row_values": dict(source_ref.row_values) if source_ref.row_values else None,
         "section": source_ref.section,
         "source_id": source_ref.source_id,
     }

@@ -207,7 +207,7 @@ class _LocalHttpHandler(BaseHTTPRequestHandler):
             self._error(
                 HTTPStatus.BAD_REQUEST,
                 "transfer_encoding_not_allowed",
-                "Transfer-Encoding ist fuer diesen lokalen Endpunkt nicht erlaubt.",
+                "Transfer-Encoding ist für diesen lokalen Endpunkt nicht erlaubt.",
             )
             return
         if is_document_upload:
@@ -228,7 +228,7 @@ class _LocalHttpHandler(BaseHTTPRequestHandler):
             self._error(
                 HTTPStatus.UNSUPPORTED_MEDIA_TYPE,
                 "utf8_required",
-                "JSON-Requests muessen UTF-8 verwenden.",
+                "JSON-Requests müssen UTF-8 verwenden.",
             )
             return
 
@@ -246,7 +246,7 @@ class _LocalHttpHandler(BaseHTTPRequestHandler):
             self._error(
                 HTTPStatus.BAD_REQUEST,
                 "invalid_content_length",
-                "Content-Length ist ungueltig.",
+                "Content-Length ist ungültig.",
             )
             return
         if content_length < 1:
@@ -269,7 +269,7 @@ class _LocalHttpHandler(BaseHTTPRequestHandler):
             self._error(
                 HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
                 "body_too_large",
-                "Die lokale Anfrage ueberschreitet das erlaubte Groessenlimit.",
+                "Die lokale Anfrage überschreitet das erlaubte Größenlimit.",
             )
             return
 
@@ -300,7 +300,7 @@ class _LocalHttpHandler(BaseHTTPRequestHandler):
             self._error(
                 HTTPStatus.BAD_REQUEST,
                 "invalid_utf8",
-                "JSON-Request ist kein gueltiges UTF-8.",
+                "JSON-Request ist kein gültiges UTF-8.",
             )
             return
         except LlamaCppUnavailableError:
@@ -315,7 +315,7 @@ class _LocalHttpHandler(BaseHTTPRequestHandler):
             self._error(
                 HTTPStatus.BAD_GATEWAY,
                 "invalid_local_model_response",
-                "Das lokale Modell hat keine gueltige Antwort geliefert. "
+                "Das lokale Modell hat keine gültige Antwort geliefert. "
                 "Bitte versuche es erneut oder formuliere deine Frage anders.",
             )
             return
@@ -404,7 +404,7 @@ def _shutdown_response_json(request_json: str) -> str:
             parse_constant=_reject_shutdown_constant,
         )
     except json.JSONDecodeError as exc:
-        raise ShutdownJsonError("Ungueltiger Shutdown-Request.") from exc
+        raise ShutdownJsonError("Ungültiger Shutdown-Request.") from exc
     if payload != {"operation": "shutdown"}:
         raise ShutdownJsonError(
             "Shutdown-Request muss exakt die Operation shutdown enthalten."
@@ -431,7 +431,7 @@ def _open_uploaded_document(
                 stream.write(body)
         except OSError as exc:
             raise DocumentJsonError(
-                "Die ausgewaehlte Datei konnte nicht lokal vorbereitet werden."
+                "Die ausgewählte Datei konnte nicht lokal vorbereitet werden."
             ) from exc
         request_json = json.dumps(
             {"operation": "open_document", "path": str(local_path)},
@@ -446,15 +446,15 @@ def _uploaded_filename(headers) -> str:
     values = headers.get_all("X-PortableAgent-Filename", failobj=[])
     if len(values) != 1 or not values[0]:
         raise DocumentJsonError(
-            "Genau ein lokaler Dateiname ist fuer die Auswahl erforderlich."
+            "Genau ein lokaler Dateiname ist für die Auswahl erforderlich."
         )
     encoded = values[0]
     if len(encoded) > 1_024 or re.search(r"%(?![0-9A-Fa-f]{2})", encoded):
-        raise DocumentJsonError("Der lokale Dateiname ist ungueltig kodiert.")
+        raise DocumentJsonError("Der lokale Dateiname ist ungültig kodiert.")
     try:
         filename = unquote(encoded, encoding="utf-8", errors="strict")
     except UnicodeError as exc:
-        raise DocumentJsonError("Der lokale Dateiname ist kein gueltiges UTF-8.") from exc
+        raise DocumentJsonError("Der lokale Dateiname ist kein gültiges UTF-8.") from exc
     if (
         not filename
         or len(filename) > 255
@@ -463,10 +463,10 @@ def _uploaded_filename(headers) -> str:
         or any(ord(character) < 32 for character in filename)
         or any(character in '<>:"/\\|?*' for character in filename)
     ):
-        raise DocumentJsonError("Der lokale Dateiname ist ungueltig.")
+        raise DocumentJsonError("Der lokale Dateiname ist ungültig.")
     if Path(filename).suffix.casefold() not in {".txt", ".docx", ".pdf"}:
         raise DocumentJsonError(
-            "Bitte waehle ein unterstuetztes Dokument im Format TXT, DOCX oder PDF."
+            "Bitte wähle ein unterstütztes Dokument im Format TXT, DOCX oder PDF."
         )
     return filename
 
@@ -475,7 +475,7 @@ def _handle_table_file(controller: TableJsonController, body: bytes) -> str:
     metadata, file_bytes = _decode_table_envelope(body)
     operation = metadata["operation"]
     if operation not in {"list_sheets", "ask_table"}:
-        raise TableJsonError("Ungueltige lokale Tabellen-Dateianfrage.")
+        raise TableJsonError("Ungültige lokale Tabellen-Dateianfrage.")
     expected = (
         {"operation", "filename"}
         if operation == "list_sheets"
@@ -484,7 +484,7 @@ def _handle_table_file(controller: TableJsonController, body: bytes) -> str:
         else {"operation", "filename", "question"}
     )
     if set(metadata) != expected:
-        raise TableJsonError("Ungueltige lokale Tabellen-Dateianfrage.")
+        raise TableJsonError("Ungültige lokale Tabellen-Dateianfrage.")
     filename = _safe_table_filename(metadata["filename"])
 
     question = None
@@ -505,7 +505,7 @@ def _handle_table_file(controller: TableJsonController, body: bytes) -> str:
                 stream.write(file_bytes)
         except OSError as exc:
             raise TableJsonError(
-                "Die ausgewaehlte Tabelle konnte nicht lokal vorbereitet werden."
+                "Die ausgewählte Tabelle konnte nicht lokal vorbereitet werden."
             ) from exc
 
         if operation == "list_sheets":
@@ -549,10 +549,10 @@ def _decode_table_envelope(body: bytes) -> tuple[dict, memoryview]:
         raise TableJsonError("Lokale Tabellen-Dateianfrage ist unvollstaendig.")
     metadata_length = int.from_bytes(body[:4], byteorder="big", signed=False)
     if not 0 < metadata_length <= MAX_TABLE_METADATA_BYTES:
-        raise TableJsonError("Tabellen-Metadaten ueberschreiten das erlaubte Limit.")
+        raise TableJsonError("Tabellen-Metadaten überschreiten das erlaubte Limit.")
     file_offset = 4 + metadata_length
     if file_offset >= len(body):
-        raise TableJsonError("Die ausgewaehlte Tabellendatei ist leer.")
+        raise TableJsonError("Die ausgewählte Tabellendatei ist leer.")
     try:
         metadata_text = body[4:file_offset].decode("utf-8", errors="strict")
         metadata = json.loads(
@@ -561,9 +561,9 @@ def _decode_table_envelope(body: bytes) -> tuple[dict, memoryview]:
             parse_constant=_reject_table_metadata_constant,
         )
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise TableJsonError("Tabellen-Metadaten sind ungueltiges UTF-8/JSON.") from exc
+        raise TableJsonError("Tabellen-Metadaten sind ungültiges UTF-8/JSON.") from exc
     if type(metadata) is not dict:
-        raise TableJsonError("Tabellen-Metadaten muessen ein Objekt sein.")
+        raise TableJsonError("Tabellen-Metadaten müssen ein Objekt sein.")
     operation = _table_metadata_string(
         metadata.get("operation"), "operation", max_chars=64
     )
@@ -591,7 +591,7 @@ def _table_metadata_string(value, path: str, *, max_chars: int) -> str:
         raise TableJsonError(f"{path} muss eine nicht leere Zeichenkette sein.")
     clean = value.strip()
     if len(clean) > max_chars or "\x00" in clean:
-        raise TableJsonError(f"{path} ist ungueltig.")
+        raise TableJsonError(f"{path} ist ungültig.")
     return clean
 
 
@@ -603,10 +603,10 @@ def _safe_table_filename(value) -> str:
         or any(ord(character) < 32 for character in filename)
         or any(character in '<>:"/\\|?*' for character in filename)
     ):
-        raise TableJsonError("Der lokale Tabellen-Dateiname ist ungueltig.")
+        raise TableJsonError("Der lokale Tabellen-Dateiname ist ungültig.")
     if Path(filename).suffix.casefold() not in {".csv", ".xlsx", ".xlsm"}:
         raise TableJsonError(
-            "Bitte waehle eine unterstuetzte Tabelle im Format CSV, XLSX oder XLSM."
+            "Bitte wähle eine unterstützte Tabelle im Format CSV, XLSX oder XLSM."
         )
     return filename
 
@@ -616,7 +616,7 @@ def _shutdown_object_without_duplicates(pairs: list[tuple[str, object]]) -> dict
     for key, value in pairs:
         if key in result:
             raise ShutdownJsonError(
-                f"Shutdown-Request enthaelt doppeltes Feld: {key}"
+                f"Shutdown-Request enthält doppeltes Feld: {key}"
             )
         result[key] = value
     return result
@@ -702,7 +702,7 @@ def _local_asset_status(
     try:
         inventory = provider()
         if not isinstance(inventory, LocalAssetInventory):
-            raise TypeError("Ungueltiger Asset-Snapshot.")
+            raise TypeError("Ungültiger Asset-Snapshot.")
     except Exception:
         return {
             "gguf_models": {"available": False, "count": 0},

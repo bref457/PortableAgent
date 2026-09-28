@@ -11,36 +11,46 @@
 </head>
 <body>
   <a class="skip-link" href="#workspace">Zum Arbeitsbereich</a>
-  <header class="masthead">
-    <div class="brand" aria-label="PortableAgent">
-      <span class="brand-mark" aria-hidden="true">P</span>
-      <div><strong>PortableAgent</strong><span>Lokale Dateianalyse</span></div>
+  <div id="app-shell" class="app-shell">
+  <aside id="app-sidebar" class="masthead" aria-label="Hauptnavigation">
+    <div class="sidebar-head">
+      <div class="brand" aria-label="PortableAgent">
+        <span class="brand-mark" aria-hidden="true">PA</span>
+        <div><strong>PortableAgent</strong><span>Lokale Dateianalyse</span></div>
+      </div>
+      <button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="Seitenleiste einklappen" aria-expanded="true">‹</button>
     </div>
-    <div class="header-badges">
-      <button id="asset-status" class="model-badge checking" type="button" title="Lokale KI-Dateien erneut prüfen">
-        <span aria-hidden="true"></span><span id="asset-status-text">KI-Dateien werden geprüft</span>
-      </button>
+    <nav class="mode-switch" aria-label="Analysemodus" role="tablist">
+      <button id="document-tab" class="mode-button active" type="button" role="tab" aria-selected="true" aria-controls="document-mode" aria-label="Dokumente"><span aria-hidden="true">D</span><span>Dokumente</span></button>
+      <button id="table-tab" class="mode-button" type="button" role="tab" aria-selected="false" aria-controls="table-mode" aria-label="Tabellen"><span aria-hidden="true">T</span><span>Tabellen</span></button>
+      <button id="memory-tab" class="mode-button" type="button" role="tab" aria-selected="false" aria-controls="memory-mode" aria-label="Memory"><span aria-hidden="true">M</span><span>Memory</span></button>
+    </nav>
+    <div class="sidebar-bottom">
       <button id="model-status" class="model-badge checking" type="button" title="Modellstatus erneut prüfen">
         <span aria-hidden="true"></span><span id="model-status-text">Modell wird geprüft</span>
       </button>
+      <button id="asset-status" class="model-badge checking" type="button" title="Lokale KI-Dateien erneut prüfen">
+        <span aria-hidden="true"></span><span id="asset-status-text">KI-Dateien werden geprüft</span>
+      </button>
       <div class="privacy-badge"><span aria-hidden="true"></span>Nur auf diesem Gerät</div>
+    </div>
+  </aside>
+
+  <div class="app-frame">
+  <header class="topbar">
+    <div class="topbar-context" aria-live="polite">
+      <strong>PortableAgent</strong>
+      <span class="topbar-divider" aria-hidden="true">/</span>
+      <span id="workspace-label">Dokumente</span>
+      <span class="topbar-divider" aria-hidden="true">/</span>
+      <span id="current-context">Keine Datei ausgewählt</span>
+    </div>
+    <div class="topbar-actions">
       <button id="shutdown-button" class="shutdown-button" type="button" title="PortableAgent kontrolliert beenden">PortableAgent beenden</button>
     </div>
   </header>
 
   <main id="workspace" class="workspace">
-    <section class="intro" aria-labelledby="page-title">
-      <p class="eyebrow">Offline-first · Keine Telemetrie</p>
-      <h1 id="page-title">Frage deine Dateien.<br><em>Die Belege bleiben sichtbar.</em></h1>
-      <p class="lede">Dokumente und Tabellen werden lokal gelesen. Es gibt keine Cloud-Übertragung und keine automatische Dateisuche.</p>
-    </section>
-
-    <nav class="mode-switch" aria-label="Analysemodus" role="tablist">
-      <button id="document-tab" class="mode-button active" type="button" role="tab" aria-selected="true" aria-controls="document-mode">Dokumente</button>
-      <button id="table-tab" class="mode-button" type="button" role="tab" aria-selected="false" aria-controls="table-mode">Tabellen</button>
-      <button id="memory-tab" class="mode-button" type="button" role="tab" aria-selected="false" aria-controls="memory-mode">Memory</button>
-    </nav>
-
     <div id="document-mode" class="mode-grid" role="tabpanel" aria-labelledby="document-tab">
     <section class="panel import-panel" aria-labelledby="import-title">
       <div class="section-heading"><span>01</span><div><h2 id="import-title">Dokument öffnen</h2><p>Wähle eine lokale Datei aus und öffne sie direkt.</p></div></div>
@@ -50,6 +60,8 @@
         <p id="document-file-note" class="field-note">TXT, DOCX oder PDF · Die Datei bleibt auf diesem Gerät. Eine kurzlebige lokale Arbeitskopie wird nach dem Einlesen sofort entfernt.</p>
       </form>
     </section>
+
+    <div id="document-splitter" class="workspace-splitter document-splitter" role="separator" aria-label="Breite zwischen Dokumentarbeit und Antwort ändern" aria-orientation="vertical" aria-valuemin="34" aria-valuemax="70" aria-valuenow="52" tabindex="0"><span aria-hidden="true"></span></div>
 
     <section class="panel sessions-panel" aria-labelledby="sessions-title">
       <div class="section-heading"><span>02</span><div><h2 id="sessions-title">Temporäre Sitzung</h2><p>Wähle und verwalte lokal geöffnete Dokumente.</p></div></div>
@@ -89,7 +101,7 @@
         <div class="section-heading"><span>T1</span><div><h2 id="table-query-title">Tabelle befragen</h2><p>CSV, XLSX oder XLSM werden für genau diese Anfrage read-only geöffnet.</p></div></div>
         <form id="table-form">
           <input id="table-file" class="visually-hidden" name="table" type="file" accept=".csv,.xlsx,.xlsm">
-          <button id="select-table" class="button-secondary table-picker" type="button" aria-describedby="table-file-note">Tabelle auswählen</button>
+          <button id="select-table" class="button-primary table-picker" type="button" aria-describedby="table-file-note">Tabelle auswählen</button>
           <p id="selected-table-name" class="selected-file" role="status">Noch keine Tabelle ausgewählt</p>
           <div id="sheet-field" class="sheet-field" hidden>
             <label for="sheet-name">Tabellenblatt</label>
@@ -102,9 +114,10 @@
         </form>
       </section>
 
+      <div id="table-splitter" class="workspace-splitter table-splitter" role="separator" aria-label="Breite zwischen Frage und Ergebnis ändern" aria-orientation="vertical" aria-valuemin="34" aria-valuemax="70" aria-valuenow="52" tabindex="0"><span aria-hidden="true"></span></div>
+
       <section class="panel table-result-panel" aria-labelledby="table-result-title">
         <div class="section-heading"><span>T2</span><div><h2 id="table-result-title">Ergebnis &amp; Zeilenbelege</h2><p>Die Quelldatei bleibt unverändert und wird nicht in einer Sitzung gehalten.</p></div></div>
-        <div id="table-empty" class="empty-state"><span aria-hidden="true">∑</span><p>Hier erscheint das lokal berechnete Ergebnis.</p></div>
         <article id="table-result-card" class="answer-card" hidden>
           <div id="table-result-content"></div>
           <div class="citation-heading"><h3 id="table-citation-title">Verwendete Zeilen</h3><span id="table-match-count"></span></div>
@@ -140,6 +153,19 @@
   </main>
 
   <footer><span>PortableAgent v0.1</span><span>Lokaler Speicher · Explizite Freigabe</span></footer>
+  </div>
+  </div>
+  <div id="working-overlay" class="working-overlay" role="status" aria-live="polite" aria-atomic="true" hidden>
+    <div class="working-card">
+      <div class="working-symbol" aria-hidden="true">
+        <span class="working-brain">🧠</span>
+        <span class="working-gear">⚙</span>
+      </div>
+      <strong id="working-title">Einen Moment …</strong>
+      <span id="working-detail">Ich arbeite lokal an deiner Anfrage.</span>
+      <span class="working-local">Alles bleibt auf diesem Gerät.</span>
+    </div>
+  </div>
   <div id="status" class="status" role="status" aria-live="polite"></div>
 </body>
 </html>

@@ -53,6 +53,10 @@ class TableJsonControllerTests(unittest.TestCase):
                 [item["row"] for item in response["result"]["citations"]],
                 [2, 3],
             )
+            self.assertEqual(
+                response["result"]["citations"][0]["row_values"],
+                {"Fix": 2, "InterneNotiz": "VERTRAULICH_771"},
+            )
             self.assertEqual(path.read_bytes(), before)
             self.assertNotIn("VERTRAULICH_771", repr(generator.calls))
             self.assertNotIn("VERTRAULICH_883", repr(generator.calls))
@@ -123,6 +127,10 @@ class TableJsonControllerTests(unittest.TestCase):
         self.assertNotIn("original_plan", result)
         self.assertEqual(resolved["result"]["type"], "query_result")
         self.assertEqual(resolved["result"]["values"], {"Dauer": 4})
+        self.assertEqual(
+            resolved["result"]["metadata"]["value_semantics"]["Dauer"],
+            {"data_type": "duration", "unit": "Stunden"},
+        )
         self.assertEqual(len(generator.calls), 1)
 
     def test_invalid_fields_fail_before_the_workflow_is_called(self):
@@ -187,7 +195,7 @@ class TableJsonControllerTests(unittest.TestCase):
         workflow = TableWorkflow(generator)
         controller = TableJsonController(workflow)
         invalid = (
-            ('{"operation":', "Ungueltiger JSON"),
+            ('{"operation":', "Ungültiger JSON"),
             (
                 '{"operation":"ask_table","operation":"ask_table"}',
                 "doppeltes Feld",
@@ -205,7 +213,7 @@ class TableJsonControllerTests(unittest.TestCase):
                         controller.handle_json(payload)
 
             limited = TableJsonController(workflow, max_request_chars=10)
-            with self.assertRaisesRegex(TableJsonError, "groesser als"):
+            with self.assertRaisesRegex(TableJsonError, "größer als"):
                 limited.handle_json('{"operation":"ask_table"}')
             ask_file.assert_not_called()
 

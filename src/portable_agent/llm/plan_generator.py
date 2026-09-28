@@ -64,6 +64,9 @@ Regeln:
 - Fuer count darf column null sein.
 - Ein Kalenderjahr wird als halboffener Datumsbereich formuliert: zum Beispiel
   Jahr 2026 bedeutet Datum >= "2026-01-01" und Datum < "2027-01-01".
+- Eine Jahreszahl gehoert nur in die Datumsfilter und niemals zusaetzlich in
+  den Wert eines Textfilters, zum Beispiel Aktion == "Influentia", nicht
+  Aktion == "Influentia 2026".
 - "letzter", "neuester" oder "spaetester" bedeutet max auf der Datumsspalte;
   "erster" oder "fruehester" bedeutet min auf der Datumsspalte.
 - Wenn nach dem ersten oder letzten Einsatz gefragt wird und eine Aktionsspalte

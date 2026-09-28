@@ -104,4 +104,3 @@ Meldeweg steht in [SECURITY.md](SECURITY.md). Architektur und Grenzen sind in
 ## Lizenz
 
 PortableAgent steht unter der [Apache License 2.0](LICENSE).
-

@@ -100,13 +100,13 @@ class MemoryJsonControllerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             controller = self.controller(temporary)
             cases = (
-                ('{"operation":', "Ungueltiger JSON-Request"),
+                ('{"operation":', "Ungültiger JSON-Request"),
                 (
                     '{"operation":"list_notes","operation":"list_notes"}',
                     "doppeltes Feld",
                 ),
                 ('{"operation":"list_notes","value":NaN}', "Nicht standardkonstanter"),
-                ("x" * 16_385, "groesser als das Limit"),
+                ("x" * 16_385, "größer als das Limit"),
             )
             for request_json, pattern in cases:
                 with self.subTest(pattern=pattern):
