@@ -65,8 +65,11 @@ lokales llama.cpp + GGUF
 
 - projektlokale Skills verwenden den offenen `SKILL.md`-Aufbau als
   Verpackungs- und Dokumentationskonvention;
-- eine statische Registry erlaubt nur mitgelieferte, gepruefte Skills und
-  ordnet sie registrierten, typisierten Capabilities zu;
+- eine statische, unveraenderliche Registry erlaubt genau bekannte, typisierte
+  und read-only Capabilities; kuenftige mitgelieferte Skills duerfen nur diese
+  Operationen anfordern;
+- die Registry enthaelt keine dynamischen Imports, Skriptpfade,
+  Verzeichnissuche oder Downloads und stoppt bei fehlenden Berechtigungen;
 - Dateityp und Skill-Familie werden deterministisch gewaehlt, waehrend das
   lokale Modell nur Absicht, Entitaet, Filter und Kennzahl interpretiert;
 - Skills koennen weder Shell noch Netzwerk, Paketinstallation, freie
