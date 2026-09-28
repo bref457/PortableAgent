@@ -6,14 +6,21 @@ Stand: 28.09.2026
 
 - Der lokale Projektstamm ist der massgebliche aktuelle Entwicklungsstand.
 - Die lokale synthetische Testsuite umfasst 230 erfolgreiche Tests.
-- GitHub `bref457/PortableAgent` endet derzeit bei Commit `288f189` mit
-  dokumentierten 218 Tests.
-- Im lokalen Projekt fehlen die `.git`-Metadaten. Gegenueber GitHub enthalten
-  41 der 114 versionierten Dateien echte Weiterentwicklungen.
+- Der lokale 230-Test-Stand wurde nachvollziehbar wieder in Git aufgenommen,
+  per Pull Request geprueft und in `main` zusammengefuehrt.
 - Runtime, Modell, Memory, Sitzungsdaten und Nutzdaten bleiben von Git
   ausgeschlossen.
-- Die GitHub-CLI kennt das Konto `bref457`, benoetigt aber eine erneute
-  Anmeldung. Zugangsdaten werden niemals in Projektdokumenten gespeichert.
+- GitHub-Sicherheitsfunktionen, Branch-Schutz und Repository-Topics sind
+  eingerichtet. Zugangsdaten werden niemals in Projektdokumenten gespeichert.
+
+## Fortschritt
+
+- Phase 1 ist abgeschlossen.
+- Phase 2 ist abgeschlossen und in `SKILL_RESEARCH.md` dokumentiert.
+- Phase 3 ist entschieden: eine kleine statische Capability Registry und
+  projektlokale, gepruefte Skills statt eines allgemeinen
+  Ausfuehrungsframeworks.
+- Naechster Entwicklungsschritt ist Phase 4.
 
 ## Verbindliche Leitlinien
 
@@ -207,6 +214,7 @@ Portabilitaetspruefung erstellt.
 
 ## Naechster konkreter Schritt
 
-Zuerst wird Phase 1 abgeschlossen. Danach folgt eine reine, dokumentierte
-Skill-Recherche. Architektur- oder Codeumbauten beginnen erst auf Basis dieser
-Ergebnisse.
+Phase 4 beginnt mit synthetischen Regressionstests fuer aktionsbezogene erste
+und letzte Vorkommen. Danach folgen Entitaetsaufloesung,
+Filter-vor-Aggregation und der Ergebnis-Verifier. Die kleine Registry wird
+erst auf diesem geprueften Workflow aufgebaut.
