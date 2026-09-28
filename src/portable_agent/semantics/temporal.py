@@ -4,11 +4,19 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from difflib import SequenceMatcher
 
-from portable_agent.domain import Calculation, Filter, QueryPlan, SortRule
+from portable_agent.domain import (
+    Calculation,
+    EntityClarificationOption,
+    EntityClarificationRequest,
+    Filter,
+    QueryPlan,
+    SortRule,
+)
 from portable_agent.sources import TableSource
 
-from .catalog import SemanticCatalog
+from .catalog import SemanticCatalog, normalize_name
 
 
 _YEAR_PATTERN = re.compile(r"(?<!\d)([1-9]\d{3})(?!\d)")
@@ -29,6 +37,7 @@ _LATEST_WORDS = (
 )
 _EARLIEST_WORDS = (
     "erste",
+    "ersten",
     "erster",
     "erstes",
     "fruheste",
@@ -37,6 +46,8 @@ _EARLIEST_WORDS = (
     "alteste",
     "altester",
     "altestes",
+    "erstmals",
+    "erstmalig",
 )
 _TOTAL_WORDS = ("gesamt", "gesamte", "gesamten", "insgesamt", "summe")
 _NON_SUM_STEMS = (
@@ -55,6 +66,31 @@ _QUANTITY_PATTERNS = (
     re.compile(r"\bwieviel\b"),
     re.compile(r"\bwie\s+viel(?:e|en|er|es)?\b"),
 )
+_NAMED_ACTION_PATTERNS = (
+    re.compile(
+        r"\baktion\s+(?P<entity>.+?)\s+(?:das\s+)?"
+        r"(?:erste|ersten|letzte|letzten|erstmals|erstmalig|zuletzt)\b"
+    ),
+    re.compile(
+        r"\b(?:war|wurde|fand|wir)\s+(?P<entity>.+?)\s+"
+        r"(?:(?:19|20)\d{2}\s+)?(?:erstmals|erstmalig|zuletzt|"
+        r"zum\s+ersten|das\s+erste|das\s+letzte)\b"
+    ),
+)
+_ENTITY_STOPWORDS = frozenset({
+    "an", "am", "bei", "das", "dem", "den", "der", "die", "ein", "eine",
+    "einem", "einen", "einer", "einsatz", "erst", "erste", "ersten",
+    "erster", "erstes", "erstmal", "erstmalig", "erstmals", "fand", "fuer",
+    "gefahren", "im", "in", "ist", "jahr", "letzte", "letzten", "letzter",
+    "letztes", "mal", "statt", "und", "vom", "von", "wann", "war", "welchem",
+    "welcher", "welches", "wurde", "wir", "zu", "zuletzt", "zum",
+    "durchgefuehrt", "durchgefuhrt", "frueheste", "fruheste", "spaeteste",
+    "spateste", "neueste", "aelteste", "alteste", "juengste", "jungste",
+})
+
+
+class TemporalEntityNotFoundError(ValueError):
+    """A named action cannot be safely resolved from local table values."""
 
 
 def build_explicit_total_plan(
@@ -146,14 +182,14 @@ def build_explicit_total_plan(
 
 
 def build_temporal_extreme_plan(
+    source: TableSource,
     question: str,
-    columns: tuple[str, ...],
     catalog: SemanticCatalog,
-) -> QueryPlan | None:
+) -> QueryPlan | EntityClarificationRequest | None:
     """Return a safe year-bounded min/max date plan when intent is exact.
 
-    The helper uses only the question and trusted schema metadata. It never
-    receives or inspects table rows or cell values.
+    Cell values are inspected only in local Python to resolve an explicitly
+    named action. They are never passed to the model.
     """
     normalized = _normalize(question)
     years = {int(match) for match in _YEAR_PATTERN.findall(normalized)}
@@ -163,14 +199,14 @@ def build_temporal_extreme_plan(
     if year is not None and year >= 9999:
         return None
 
-    wants_latest = any(word in normalized for word in _LATEST_WORDS)
-    wants_earliest = any(word in normalized for word in _EARLIEST_WORDS)
+    wants_latest = any(_mentions(normalized, word) for word in _LATEST_WORDS)
+    wants_earliest = any(_mentions(normalized, word) for word in _EARLIEST_WORDS)
     if wants_latest == wants_earliest:
         return None
 
     date_columns = tuple(
         column
-        for column in columns
+        for column in source.columns
         if (field := catalog.field_for_column(column)) is not None
         and field.data_type == "date"
     )
@@ -180,23 +216,168 @@ def build_temporal_extreme_plan(
     date_column = date_columns[0]
     aggregation = "max" if wants_latest else "min"
     label = "Letzter Einsatz" if wants_latest else "Erster Einsatz"
-    filters = () if year is None else (
+    date_filters = () if year is None else (
         Filter(date_column, ">=", f"{year:04d}-01-01"),
         Filter(date_column, "<", f"{year + 1:04d}-01-01"),
     )
     action_columns = tuple(
         column
-        for column in columns
+        for column in source.columns
         if (field := catalog.field_for_column(column)) is not None
         and field.canonical_name == "Aktion"
     )
+    if len(action_columns) == 1:
+        action_column = action_columns[0]
+        action_resolution = _resolve_named_action(
+            source,
+            normalized,
+            action_column,
+            catalog,
+        )
+        base_plan = QueryPlan(
+            filters=date_filters,
+            calculations=(Calculation(label, aggregation, date_column),),
+        )
+        if isinstance(action_resolution, str):
+            return QueryPlan(
+                filters=(Filter(action_column, "==", action_resolution), *date_filters),
+                calculations=base_plan.calculations,
+            )
+        if isinstance(action_resolution, EntityClarificationRequest):
+            return EntityClarificationRequest(
+                question=action_resolution.question,
+                column=action_column,
+                options=action_resolution.options,
+                original_plan=base_plan,
+            )
+
     group_by = action_columns[0] if len(action_columns) == 1 else None
     return QueryPlan(
-        filters=filters,
+        filters=date_filters,
         calculations=(Calculation(label, aggregation, date_column),),
         group_by=group_by,
         sort=(SortRule(label, "desc" if wants_latest else "asc"),) if group_by else (),
         limit=1 if group_by else None,
+    )
+
+
+def _resolve_named_action(
+    source: TableSource,
+    normalized_question: str,
+    action_column: str,
+    catalog: SemanticCatalog,
+) -> str | EntityClarificationRequest | None:
+    values = tuple(dict.fromkeys(
+        value
+        for row in source.iter_rows()
+        if isinstance((value := row.values.get(action_column)), str) and value.strip()
+    ))
+    exact = tuple(
+        value for value in values
+        if _mentions(normalized_question, _normalize(value))
+    )
+    if exact:
+        longest = max(len(normalize_name(value)) for value in exact)
+        best = tuple(value for value in exact if len(normalize_name(value)) == longest)
+        if len(best) == 1:
+            return best[0]
+        return _entity_clarification(action_column, best, "Welche Aktion ist gemeint?")
+
+    hints = _entity_hint_tokens(normalized_question, catalog)
+    if not hints:
+        return None
+    candidates = tuple(
+        value for value in values if _is_possible_action(hints, value)
+    )
+    if candidates:
+        question = (
+            "Welche Aktion ist gemeint?"
+            if len(candidates) > 1
+            else "Meintest du diese Aktion?"
+        )
+        return _entity_clarification(action_column, candidates, question)
+    if _looks_like_named_action(normalized_question):
+        raise TemporalEntityNotFoundError(
+            "Die genannte Aktion wurde in der Tabelle nicht gefunden. "
+            "Bitte verwende ihre genaue Bezeichnung."
+        )
+    return None
+
+
+def _entity_hint_tokens(
+    normalized_question: str,
+    catalog: SemanticCatalog,
+) -> tuple[str, ...]:
+    ignored = set(_ENTITY_STOPWORDS)
+    ignored.update(_LATEST_WORDS)
+    ignored.update(_EARLIEST_WORDS)
+    for field in catalog.fields:
+        if field.canonical_name in {"Aktion", "Datum"}:
+            for name in field.all_names:
+                ignored.update(re.findall(r"[a-z0-9]+", _normalize(name)))
+    return tuple(
+        token
+        for token in re.findall(r"[a-z0-9]+", normalized_question)
+        if token not in ignored
+        and not _YEAR_PATTERN.fullmatch(token)
+        and len(token) >= 2
+    )
+
+
+def _is_possible_action(hints: tuple[str, ...], value: str) -> bool:
+    value_tokens = tuple(re.findall(r"[a-z0-9]+", _normalize(value)))
+    compact_value = normalize_name(value)
+    for hint in hints:
+        compact_hint = normalize_name(hint)
+        if compact_hint in value_tokens:
+            return True
+        if len(compact_hint) >= 3 and (
+            compact_value.startswith(compact_hint)
+            or compact_hint.startswith(compact_value)
+        ):
+            return True
+        if len(compact_hint) >= 4 and any(
+            SequenceMatcher(None, compact_hint, token).ratio() >= 0.8
+            for token in value_tokens
+        ):
+            return True
+    return False
+
+
+def _looks_like_named_action(normalized_question: str) -> bool:
+    for pattern in _NAMED_ACTION_PATTERNS:
+        match = pattern.search(normalized_question)
+        if match is None:
+            continue
+        entity = match.group("entity")
+        meaningful = tuple(
+            token
+            for token in re.findall(r"[a-z0-9]+", entity)
+            if token not in _ENTITY_STOPWORDS
+            and not _YEAR_PATTERN.fullmatch(token)
+        )
+        if meaningful:
+            return True
+    return False
+
+
+def _entity_clarification(
+    action_column: str,
+    values: tuple[str, ...],
+    question: str,
+) -> EntityClarificationRequest:
+    return EntityClarificationRequest(
+        question=question,
+        column=action_column,
+        options=tuple(
+            EntityClarificationOption(
+                id=f"entity-{index}",
+                label=value,
+                value=value,
+            )
+            for index, value in enumerate(values, start=1)
+        ),
+        original_plan=QueryPlan(),
     )
 
 

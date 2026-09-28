@@ -127,6 +127,8 @@ class StaticUiTests(unittest.TestCase):
         self.assertIn("new TextEncoder()", self.javascript)
         self.assertIn('operation: "resolve_table"', self.javascript)
         self.assertIn("clarification-option", self.javascript)
+        self.assertIn('result.clarification_kind === "entity"', self.javascript)
+        self.assertIn("mögliche Aktion", self.javascript)
         self.assertIn("textContent", self.javascript)
         self.assertIn("createElement", self.javascript)
         self.assertNotIn("innerHTML", self.javascript)

@@ -6,10 +6,15 @@ from collections.abc import Mapping
 from typing import Any, Protocol
 
 from portable_agent.analysis import execute_table_plan
-from portable_agent.domain import ClarificationRequest, QueryResult
+from portable_agent.domain import (
+    ClarificationRequest,
+    EntityClarificationRequest,
+    QueryResult,
+)
 from portable_agent.plans import PlanDecodeError, PlanValidationError, query_plan_from_dict
 from portable_agent.semantics import (
     SemanticCatalog,
+    TemporalEntityNotFoundError,
     apply_semantic_policy,
     attach_result_semantics,
     build_explicit_total_plan,
@@ -43,7 +48,7 @@ def answer_table_question(
     *,
     semantic_definitions: Mapping[str, str] | None = None,
     semantic_catalog: SemanticCatalog | None = None,
-) -> QueryResult | ClarificationRequest:
+) -> QueryResult | ClarificationRequest | EntityClarificationRequest:
     """Generate, decode, validate and execute a table plan with citations."""
     if not isinstance(question, str) or not question.strip():
         raise TableQuestionError("Die Frage darf nicht leer sein.")
@@ -76,11 +81,16 @@ def answer_table_question(
                 semantic_catalog,
                 tuple(source.columns),
             )
-        temporal_plan = build_temporal_extreme_plan(
-            clean_question,
-            tuple(source.columns),
-            semantic_catalog,
-        )
+        try:
+            temporal_plan = build_temporal_extreme_plan(
+                source,
+                clean_question,
+                semantic_catalog,
+            )
+        except TemporalEntityNotFoundError as exc:
+            raise TableQuestionError(str(exc)) from exc
+        if isinstance(temporal_plan, EntityClarificationRequest):
+            return temporal_plan
         if temporal_plan is not None:
             apply_semantic_policy(source, temporal_plan, clean_question, semantic_catalog)
             return attach_result_semantics(

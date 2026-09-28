@@ -7,6 +7,8 @@ from typing import Any
 
 from portable_agent.agent import PendingTableClarification, TableWorkflow
 from portable_agent.domain import (
+    ClarificationRequest,
+    EntityClarificationRequest,
     QueryResult,
     SourceRef,
 )
@@ -173,9 +175,25 @@ def _result_dict(
         }
     if isinstance(result, PendingTableClarification):
         request = result.request
+        if isinstance(request, EntityClarificationRequest):
+            return {
+                "candidate_count": len(request.options),
+                "clarification_id": result.clarification_id,
+                "clarification_kind": "entity",
+                "column": request.column,
+                "options": [
+                    {"id": option.id, "label": option.label}
+                    for option in request.options
+                ],
+                "question": request.question,
+                "type": "clarification",
+            }
+        if not isinstance(request, ClarificationRequest):
+            raise TypeError("Unbekannte Tabellen-Rueckfrage.")
         return {
             "calculation_label": request.calculation_label,
             "clarification_id": result.clarification_id,
+            "clarification_kind": "aggregation",
             "column": request.column,
             "matched_rows": request.matched_rows,
             "options": [

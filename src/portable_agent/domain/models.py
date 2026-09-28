@@ -72,6 +72,21 @@ class ClarificationRequest:
 
 
 @dataclass(frozen=True, slots=True)
+class EntityClarificationOption:
+    id: str
+    label: str
+    value: str
+
+
+@dataclass(frozen=True, slots=True)
+class EntityClarificationRequest:
+    question: str
+    column: str
+    options: tuple[EntityClarificationOption, ...]
+    original_plan: QueryPlan
+
+
+@dataclass(frozen=True, slots=True)
 class DocumentAnswer:
     text: str
     citations: tuple[SourceRef, ...]

@@ -550,7 +550,9 @@ function renderClarification(result) {
   const title = document.createElement("h3");
   title.textContent = result.question;
   const note = document.createElement("p");
-  note.textContent = `${result.matched_rows} passende Zeilen. Präzisiere deine Frage mit einer der folgenden Berechnungen:`;
+  note.textContent = result.clarification_kind === "entity"
+    ? `${result.candidate_count} mögliche Aktion${result.candidate_count === 1 ? "" : "en"}. Wähle die gemeinte Bezeichnung:`
+    : `${result.matched_rows} passende Zeilen. Präzisiere deine Frage mit einer der folgenden Berechnungen:`;
   const options = document.createElement("div");
   options.className = "clarification-options";
   for (const option of result.options) {
@@ -566,7 +568,9 @@ function renderClarification(result) {
   }
   box.append(title, note, options);
   elements.tableContent.append(box);
-  elements.tableMatchCount.textContent = `${result.matched_rows} passende Zeilen`;
+  elements.tableMatchCount.textContent = result.clarification_kind === "entity"
+    ? `${result.candidate_count} mögliche Aktion${result.candidate_count === 1 ? "" : "en"}`
+    : `${result.matched_rows} passende Zeilen`;
   elements.tableCitationHeading.hidden = true;
 }
 

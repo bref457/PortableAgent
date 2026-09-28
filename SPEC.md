@@ -85,6 +85,10 @@ lokales llama.cpp + GGUF
 ### Analysis
 
 - deterministische Python-Engine fuer tabellarische Abfragen in v0.1;
+- bei ersten und letzten Vorkommen benannter Aktionen wird die Entitaet lokal
+  aufgeloest und gefiltert, bevor `min` beziehungsweise `max` berechnet wird;
+- aehnliche Namen und Tippfehler werden nicht still angenommen, sondern als
+  typisierte lokale Rueckfrage ausgegeben;
 - DuckDB erst spaeter optional, wenn reproduzierbare Leistungstests einen
   konkreten Bedarf belegen;
 - reproduzierbare Ergebnisse und explizite Rechenschritte;

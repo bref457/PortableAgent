@@ -8,7 +8,11 @@ from pathlib import Path
 from threading import RLock
 from uuid import uuid4
 
-from portable_agent.domain import ClarificationRequest, QueryResult
+from portable_agent.domain import (
+    ClarificationRequest,
+    EntityClarificationRequest,
+    QueryResult,
+)
 from portable_agent.semantics import SemanticCatalog, load_default_semantic_catalog
 from portable_agent.sources import TableSource, open_table_source
 
@@ -29,13 +33,13 @@ class PendingTableClarification:
     """Public handle for one temporary, locally resolvable clarification."""
 
     clarification_id: str
-    request: ClarificationRequest
+    request: ClarificationRequest | EntityClarificationRequest
 
 
 @dataclass(frozen=True, slots=True)
 class _PendingState:
     source: TableSource
-    request: ClarificationRequest
+    request: ClarificationRequest | EntityClarificationRequest
 
 
 class TableWorkflow:
@@ -83,7 +87,7 @@ class TableWorkflow:
             catalog=self._catalog,
         )
         result = agent.ask(question)
-        if isinstance(result, ClarificationRequest):
+        if isinstance(result, (ClarificationRequest, EntityClarificationRequest)):
             return self._register_clarification(source, result)
         return result
 
@@ -121,7 +125,7 @@ class TableWorkflow:
     def _register_clarification(
         self,
         source: TableSource,
-        request: ClarificationRequest,
+        request: ClarificationRequest | EntityClarificationRequest,
     ) -> PendingTableClarification:
         with self._lock:
             if len(self._pending) >= self._max_pending:

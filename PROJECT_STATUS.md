@@ -51,7 +51,7 @@ weder Laufzeitabhaengigkeit noch Bestandteil dieses Repositories.
 
 ## Verifikation
 
-Alle **230 synthetischen Unit- und Integrationstests** laufen mit der
+Alle **243 synthetischen Unit- und Integrationstests** laufen mit der
 portablen Projektlaufzeit erfolgreich. `start.bat --check` bestaetigt die
 portable Runtime. Die Tests lesen keine externen Dateien und keine Nutzdaten.
 
@@ -131,37 +131,25 @@ Analyseplaene, Python-Engine und Quellenbelege bleiben Grundlage.
 ## Naechste Schritte
 
 1. physischen Portabilitaets-Smoke-Test durchfuehren;
-2. synthetische Regressionstests fuer aktionsbezogene erste und letzte
-   Vorkommen ergaenzen;
-3. Entitaetsaufloesung, Filter-vor-Aggregation und Ergebnis-Verifier
-   implementieren;
-4. darauf die statische Registry und den lokalen
+2. den expliziten Ergebnis-Verifier fuer Tabellenplaene implementieren;
+3. darauf die statische Capability Registry und den lokalen
    `spreadsheet-analysis`-Skill aufbauen;
-5. v0.1-Release erst nach abgeschlossenem Sicherheits- und Lizenzabgleich
+4. v0.1-Release erst nach abgeschlossenem Sicherheits- und Lizenzabgleich
    veroeffentlichen.
 
 ## Letzter abgeschlossener Entwicklungsschritt
 
-Die lokale Weboberflaeche ist als kompakter Desktop-Arbeitsbereich mit
-einklappbarer Navigation aufgebaut. Dokument- und Tabellenansicht besitzen
-nun beide einen verschiebbaren, tastaturbedienbaren Trenner. Tabellenbelege
-zeigen die verwendeten Zeileninhalte mit semantisch formatierten Dauern und
-Uhrzeiten. Dabei ist nur die erste verwendete Zeile anfangs geöffnet; weitere
-Zeilen lassen sich bei Bedarf einzeln aufklappen. Die Tabellenansicht verzichtet
-auf einen redundanten Ergebnisplatzhalter und verwendet für die Dateiauswahl
-denselben primaeren Schaltflaechenstil wie die übrigen Importbereiche.
-Modell- und KI-Dateistatus stehen kompakt und einzeilig im unteren Bereich der
-Navigation; im eingeklappten Zustand sind ihre Statuspunkte exakt ausgerichtet.
-Das kompakte Markenkennzeichen lautet `PA`. Die obere Leiste bleibt dadurch auf
-Kontext und Beenden reduziert. Sichtbare deutsche Meldungen verwenden echte
-Umlaute. Bei Minimum und Maximum werden nur die entscheidenden Belegzeilen
-ausgegeben, einschließlich aller Gleichstände; Summe und Durchschnitt behalten
-alle beitragenden Zeilen.
-Eindeutige Fragen nach der Gesamtdauer einer konkret genannten
-Aktion in einem Jahr werden lokal deterministisch geplant. Natürliche
-Mengenfragen wie `Wieviel Aufwand hatte …?` verwenden den fachlichen
-Katalogalias und liefern nur die erfragte Kennzahl, statt zusätzliche
-Personalwerte zu summieren. Abweichende Absichten wie Durchschnitt, Minimum
-oder Maximum bleiben getrennt. Zellwerte werden dabei nicht an das Modell
-weitergegeben. Die vollständige synthetische Testsuite umfasst jetzt 230
+Phase 4 stabilisiert erste und letzte Vorkommen einer konkret genannten
+Aktion. Die Aktion wird ausschliesslich in lokalem Python gegen die
+Tabellenwerte aufgeloest. Erst danach werden passende Zeilen gefiltert und
+`min` oder `max` auf der Datumsspalte berechnet. Andere Aktionen koennen das
+Ergebnis damit nicht mehr verfaelschen.
+
+Natuerliche Varianten mit `erstmals`, `zum ersten Mal` und `zuletzt` werden
+deterministisch erkannt. Jahresgrenzen, fehlende Datumswerte und explizit
+ausgewaehlte Excel-Tabellenblaetter sind abgedeckt. Aehnliche Namen und
+Tippfehler erzeugen eine lokal aufloesbare, typisierte Rueckfrage in API und
+Weboberflaeche; unbekannte Aktionen stoppen sicher vor einem Modellaufruf.
+Zellwerte werden weiterhin niemals an das Modell uebergeben und die
+Quelldatei bleibt unveraendert. Die synthetische Testsuite umfasst jetzt 243
 erfolgreiche Tests.

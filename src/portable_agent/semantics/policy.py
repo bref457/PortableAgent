@@ -10,6 +10,7 @@ from portable_agent.analysis import count_matching_rows
 from portable_agent.domain import (
     ClarificationOption,
     ClarificationRequest,
+    EntityClarificationRequest,
     Filter,
     QueryPlan,
     QueryResult,
@@ -99,10 +100,21 @@ def apply_semantic_policy(
 
 
 def resolve_clarification(
-    request: ClarificationRequest,
+    request: ClarificationRequest | EntityClarificationRequest,
     option_id: str,
 ) -> QueryPlan:
     """Apply a selected offered aggregation without invoking a model again."""
+    if isinstance(request, EntityClarificationRequest):
+        option = next((item for item in request.options if item.id == option_id), None)
+        if option is None:
+            raise SemanticPolicyError("Die gewählte Rückfrageoption ist ungültig.")
+        return replace(
+            request.original_plan,
+            filters=(
+                Filter(request.column, "==", option.value),
+                *request.original_plan.filters,
+            ),
+        )
     option = next((item for item in request.options if item.id == option_id), None)
     if option is None:
         raise SemanticPolicyError("Die gewählte Rückfrageoption ist ungültig.")
