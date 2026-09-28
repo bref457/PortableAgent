@@ -160,7 +160,8 @@ def build_explicit_total_plan(
     if len(best) != 1:
         return None
 
-    filters = [Filter(action_column, "==", best[0])]
+    action_filter = Filter(action_column, "==", best[0])
+    filters = [action_filter]
     date_columns = [
         column
         for column in source.columns
@@ -178,6 +179,7 @@ def build_explicit_total_plan(
     return QueryPlan(
         filters=tuple(filters),
         calculations=(Calculation(f"Gesamte {measure_column}", "sum", measure_column),),
+        required_filters=(action_filter,),
     )
 
 
@@ -239,9 +241,11 @@ def build_temporal_extreme_plan(
             calculations=(Calculation(label, aggregation, date_column),),
         )
         if isinstance(action_resolution, str):
+            action_filter = Filter(action_column, "==", action_resolution)
             return QueryPlan(
-                filters=(Filter(action_column, "==", action_resolution), *date_filters),
+                filters=(action_filter, *date_filters),
                 calculations=base_plan.calculations,
+                required_filters=(action_filter,),
             )
         if isinstance(action_resolution, EntityClarificationRequest):
             return EntityClarificationRequest(

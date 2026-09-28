@@ -33,6 +33,7 @@ class QueryPlan:
     group_by: str | None = None
     sort: tuple[SortRule, ...] = ()
     limit: int | None = None
+    required_filters: tuple[Filter, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

@@ -103,16 +103,21 @@ def resolve_clarification(
     request: ClarificationRequest | EntityClarificationRequest,
     option_id: str,
 ) -> QueryPlan:
-    """Apply a selected offered aggregation without invoking a model again."""
+    """Apply one selected aggregation or entity without another model call."""
     if isinstance(request, EntityClarificationRequest):
         option = next((item for item in request.options if item.id == option_id), None)
         if option is None:
             raise SemanticPolicyError("Die gewählte Rückfrageoption ist ungültig.")
+        entity_filter = Filter(request.column, "==", option.value)
         return replace(
             request.original_plan,
             filters=(
-                Filter(request.column, "==", option.value),
+                entity_filter,
                 *request.original_plan.filters,
+            ),
+            required_filters=(
+                entity_filter,
+                *request.original_plan.required_filters,
             ),
         )
     option = next((item for item in request.options if item.id == option_id), None)

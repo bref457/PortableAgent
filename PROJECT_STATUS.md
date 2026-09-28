@@ -32,6 +32,10 @@ weder Laufzeitabhaengigkeit noch Bestandteil dieses Repositories.
   verschiebbarer Tabellenaufteilung;
 - lokale Normalisierung eindeutiger Textfilter und sichere Trennung von
   Jahresangaben und Aktionsnamen;
+- expliziter deterministischer Ergebnis-Verifier fuer Werte, Filter,
+  Gruppierung, Sortierung, Limits, Metadaten und exakte Zeilenbelege;
+- vertrauenswuerdige interne Pflichtfilter fuer lokal aufgeloeste Entitaeten,
+  die nicht durch Modell-JSON gesetzt werden koennen;
 - portable Windows-Startdiagnose und relative Anwendungspfade;
 - synthetische Beispieltabellen und -dokumente unter `examples/synthetic/`.
 
@@ -51,7 +55,7 @@ weder Laufzeitabhaengigkeit noch Bestandteil dieses Repositories.
 
 ## Verifikation
 
-Alle **243 synthetischen Unit- und Integrationstests** laufen mit der
+Alle **260 synthetischen Unit- und Integrationstests** laufen mit der
 portablen Projektlaufzeit erfolgreich. `start.bat --check` bestaetigt die
 portable Runtime. Die Tests lesen keine externen Dateien und keine Nutzdaten.
 
@@ -131,13 +135,25 @@ Analyseplaene, Python-Engine und Quellenbelege bleiben Grundlage.
 ## Naechste Schritte
 
 1. physischen Portabilitaets-Smoke-Test durchfuehren;
-2. den expliziten Ergebnis-Verifier fuer Tabellenplaene implementieren;
-3. darauf die statische Capability Registry und den lokalen
+2. die statische Capability Registry und danach den lokalen
    `spreadsheet-analysis`-Skill aufbauen;
-4. v0.1-Release erst nach abgeschlossenem Sicherheits- und Lizenzabgleich
+3. v0.1-Release erst nach abgeschlossenem Sicherheits- und Lizenzabgleich
    veroeffentlichen.
 
 ## Letzter abgeschlossener Entwicklungsschritt
+
+Jeder produktive Tabellen-Antwortpfad fuehrt jetzt nach der Berechnung und vor
+der Ausgabe einen unabhaengigen, deterministischen Ergebnis-Verifier aus.
+Berechnung und Pruefung verwenden denselben einmalig aufgenommenen,
+unveraenderlichen Zeilen-Snapshot. Der Verifier rekonstruiert Filtermenge,
+Berechnungen, Gruppen, Sortierung, Limit, Metadaten und die exakt notwendigen
+Belegzeilen. Bei jeder Abweichung wird das Ergebnis vollstaendig verworfen;
+es gibt weder eine Modellwiederholung noch eine plausible Ersatzantwort.
+
+Fuer lokal aufgeloeste Aktionen enthaelt der vertrauenswuerdig erstellte Plan
+interne Pflichtfilter. Die Validierung stellt sicher, dass diese Filter im
+ausgefuehrten Plan vorhanden sind und mindestens eine Quellzeile treffen. Das
+Modell kann solche Anforderungen nicht ueber sein JSON setzen oder veraendern.
 
 Phase 4 stabilisiert erste und letzte Vorkommen einer konkret genannten
 Aktion. Die Aktion wird ausschliesslich in lokalem Python gegen die
@@ -151,5 +167,5 @@ ausgewaehlte Excel-Tabellenblaetter sind abgedeckt. Aehnliche Namen und
 Tippfehler erzeugen eine lokal aufloesbare, typisierte Rueckfrage in API und
 Weboberflaeche; unbekannte Aktionen stoppen sicher vor einem Modellaufruf.
 Zellwerte werden weiterhin niemals an das Modell uebergeben und die
-Quelldatei bleibt unveraendert. Die synthetische Testsuite umfasst jetzt 243
+Quelldatei bleibt unveraendert. Die synthetische Testsuite umfasst jetzt 260
 erfolgreiche Tests.

@@ -32,6 +32,16 @@ class PlanCodecTests(unittest.TestCase):
                 "python": "do_something()",
             })
 
+    def test_model_cannot_supply_internal_verification_requirements(self):
+        with self.assertRaisesRegex(
+            PlanDecodeError,
+            "unbekannte Felder: required_filters",
+        ):
+            query_plan_from_dict({
+                "calculations": [{"label": "Anzahl", "aggregation": "count"}],
+                "required_filters": [],
+            })
+
     def test_unknown_nested_field_is_rejected(self):
         with self.assertRaisesRegex(PlanDecodeError, "unbekannte Felder: expression"):
             query_plan_from_dict({

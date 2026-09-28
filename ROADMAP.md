@@ -5,7 +5,7 @@ Stand: 28.09.2026
 ## Ausgangslage
 
 - Der lokale Projektstamm ist der massgebliche aktuelle Entwicklungsstand.
-- Die lokale synthetische Testsuite umfasst 243 erfolgreiche Tests.
+- Die lokale synthetische Testsuite umfasst 260 erfolgreiche Tests.
 - Der lokale 230-Test-Stand wurde nachvollziehbar wieder in Git aufgenommen,
   per Pull Request geprueft und in `main` zusammengefuehrt.
 - Runtime, Modell, Memory, Sitzungsdaten und Nutzdaten bleiben von Git
@@ -22,7 +22,9 @@ Stand: 28.09.2026
   Ausfuehrungsframeworks.
 - Phase 4 ist abgeschlossen: aktionsbezogene erste und letzte Vorkommen werden
   lokal aufgeloest, vor der Datumsaggregation gefiltert und belegt.
-- Naechster Entwicklungsschritt ist Phase 5.
+- Der explizite Ergebnis-Verifier aus Phase 5 ist abgeschlossen.
+- Naechster Entwicklungsschritt ist die statische Capability Registry als
+  verbleibender Teil von Phase 5.
 
 ## Verbindliche Leitlinien
 
@@ -145,6 +147,8 @@ das frueheste Datum einer anderen Aktion ausgegeben wird.
 
 ## Phase 5: Capability Registry und Verifier
 
+Status: Ergebnis-Verifier abgeschlossen; Capability Registry ausstehend.
+
 Nur tatsaechlich benoetigte Faehigkeiten werden registriert, beispielsweise:
 
 - `table.inspect`
@@ -218,6 +222,6 @@ Portabilitaetspruefung erstellt.
 
 ## Naechster konkreter Schritt
 
-Phase 5 beginnt mit einem expliziten Ergebnis-Verifier fuer den nun geprueften
-Workflow. Danach wird die kleine Capability Registry aufgebaut. Der lokale
-`spreadsheet-analysis`-Skill folgt erst auf dieser deterministischen Basis.
+Als verbleibender Teil von Phase 5 wird die kleine statische Capability
+Registry aufgebaut. Der lokale `spreadsheet-analysis`-Skill folgt erst auf
+dieser nun auch durch den Ergebnis-Verifier geschuetzten Basis.

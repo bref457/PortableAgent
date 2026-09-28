@@ -58,6 +58,9 @@ passt, die Abweichung deutlich nennen und nicht eigenmaechtig korrigieren.
 
 ## Entwicklung
 
+- Subagents verwenden, wenn Aufgaben sinnvoll voneinander trennbar sind und
+  dadurch voraussichtlich Zeit oder Credits gespart werden. Bei kleinen oder
+  stark zusammenhaengenden Aenderungen ohne Subagents weiterarbeiten.
 - Kleine, pruefbare Migrationen statt einer Komplettkopie des Altprojekts.
 - Uebernommene Logik an neuen Schnittstellen kapseln und ihre Herkunft in
   `PROJECT_STATUS.md` dokumentieren.

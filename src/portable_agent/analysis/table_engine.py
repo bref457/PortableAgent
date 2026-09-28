@@ -15,8 +15,8 @@ class PlanExecutionError(ValueError):
     """A valid plan cannot be applied to the supplied row values."""
 
 
-def execute_table_plan(source: TableSource, plan: QueryPlan) -> QueryResult:
-    """Validate and execute a plan without mutating or persisting source data."""
+def _execute_table_plan(source: TableSource, plan: QueryPlan) -> QueryResult:
+    """Raw internal executor; public callers must use the verified boundary."""
     validate_plan(plan, set(source.columns))
     matched = tuple(row for row in source.iter_rows() if _matches_all(row, plan.filters))
 

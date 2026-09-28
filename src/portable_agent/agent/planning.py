@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any, Protocol
 
-from portable_agent.analysis import execute_table_plan
+from portable_agent.analysis import execute_verified_table_plan
 from portable_agent.domain import (
     ClarificationRequest,
     EntityClarificationRequest,
@@ -76,7 +76,7 @@ def answer_table_question(
                 semantic_catalog,
             )
             return attach_result_semantics(
-                execute_table_plan(source, explicit_total_plan),
+                execute_verified_table_plan(source, explicit_total_plan),
                 explicit_total_plan,
                 semantic_catalog,
                 tuple(source.columns),
@@ -94,7 +94,7 @@ def answer_table_question(
         if temporal_plan is not None:
             apply_semantic_policy(source, temporal_plan, clean_question, semantic_catalog)
             return attach_result_semantics(
-                execute_table_plan(source, temporal_plan),
+                execute_verified_table_plan(source, temporal_plan),
                 temporal_plan,
                 semantic_catalog,
                 tuple(source.columns),
@@ -121,7 +121,7 @@ def answer_table_question(
             if clarification is not None:
                 return clarification
             return attach_result_semantics(
-                execute_table_plan(source, plan),
+                execute_verified_table_plan(source, plan),
                 plan,
                 semantic_catalog,
                 tuple(source.columns),
