@@ -107,6 +107,10 @@ Dokumentdaten wurden nicht uebernommen.
   private Meldungen von Sicherheitsluecken sind aktiviert.
 - Repository-Beschreibung und Topics kennzeichnen das Projekt als lokale,
   offline-first Dokument- und Tabellenanalyse.
+- `AGENTS.md` ist die gemeinsame versionierte Regelquelle fuer Coding Agents;
+  `CLAUDE.md` importiert sie fuer eine verlustarme Uebergabe an Claude Code.
+  Dauerhafte Projektinformationen werden nicht nur in Chatverlaeufen oder
+  agentenspezifischem Auto Memory gehalten.
 
 ## Skill-Recherche und Architekturentscheid
 

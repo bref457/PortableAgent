@@ -72,6 +72,11 @@ lokalen Modellstart zeigt `python -m portable_agent --help`.
 Alle Standardtests arbeiten ausschliesslich mit synthetischen Daten. Hinweise
 fuer Beitraege stehen in [CONTRIBUTING.md](CONTRIBUTING.md).
 
+Coding Agents verwenden [AGENTS.md](AGENTS.md) als gemeinsame Regelquelle.
+[CLAUDE.md](CLAUDE.md) importiert dieselben Regeln fuer Claude Code, damit
+Projektstand, Sicherheitsgrenzen und die Kurzkommandos `update dich` und
+`save` bei einem Werkzeugwechsel erhalten bleiben.
+
 ## Projektstruktur
 
 ```text
