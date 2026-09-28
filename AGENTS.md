@@ -3,6 +3,22 @@
 Diese Regeln gelten fuer das neue Projekt `PortableAgent` und alle seine
 Unterordner.
 
+## Arbeitsbeginn und Kurzkommando
+
+Wenn der Benutzer `update dich` schreibt, vor allen anderen Arbeiten:
+
+1. `PROJECT_STATUS.md`, `ROADMAP.md`, `SPEC.md` und `SKILL_RESEARCH.md`
+   vollstaendig lesen.
+2. Den aktuellen Git-Status, den aktiven Branch und die letzten Commits
+   pruefen.
+3. Vorhandene Aenderungen respektieren und nichts veraendern.
+4. Dem Benutzer den verstandenen Projektstand und den naechsten vorgesehenen
+   Schritt kurz zusammenfassen.
+5. Danach auf die naechste Anweisung des Benutzers warten.
+
+Falls eine der genannten Dateien fehlt oder Git nicht zum dokumentierten Stand
+passt, die Abweichung deutlich nennen und nicht eigenmaechtig korrigieren.
+
 ## Projektgrenzen
 
 - Ein gegebenenfalls lokal vorhandenes Vorgaengerprojekt ist ausschliesslich
