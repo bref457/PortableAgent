@@ -5,7 +5,7 @@ Stand: 28.09.2026
 ## Ausgangslage
 
 - Der lokale Projektstamm ist der massgebliche aktuelle Entwicklungsstand.
-- Die lokale synthetische Testsuite umfasst 260 erfolgreiche Tests.
+- Die lokale synthetische Testsuite umfasst 268 erfolgreiche Tests.
 - Der lokale 230-Test-Stand wurde nachvollziehbar wieder in Git aufgenommen,
   per Pull Request geprueft und in `main` zusammengefuehrt.
 - Runtime, Modell, Memory, Sitzungsdaten und Nutzdaten bleiben von Git
@@ -22,9 +22,9 @@ Stand: 28.09.2026
   Ausfuehrungsframeworks.
 - Phase 4 ist abgeschlossen: aktionsbezogene erste und letzte Vorkommen werden
   lokal aufgeloest, vor der Datumsaggregation gefiltert und belegt.
-- Der explizite Ergebnis-Verifier aus Phase 5 ist abgeschlossen.
-- Naechster Entwicklungsschritt ist die statische Capability Registry als
-  verbleibender Teil von Phase 5.
+- Phase 5 ist abgeschlossen: Der explizite Ergebnis-Verifier und die statische
+  Capability Registry sichern jeden produktiven Tabellen-Antwortpfad.
+- Naechster Entwicklungsschritt ist die lokale Modellevaluation aus Phase 6.
 
 ## Verbindliche Leitlinien
 
@@ -147,16 +147,24 @@ das frueheste Datum einer anderen Aktion ausgegeben wird.
 
 ## Phase 5: Capability Registry und Verifier
 
-Status: Ergebnis-Verifier abgeschlossen; Capability Registry ausstehend.
+Status: abgeschlossen am 28.09.2026.
 
 Nur tatsaechlich benoetigte Faehigkeiten werden registriert, beispielsweise:
 
 - `table.inspect`
+- `table.resolve_entity`
 - `table.filter`
 - `table.aggregate`
 - `table.first_occurrence`
 - `table.last_occurrence`
 - `table.source_rows`
+- `result.verify`
+
+Die Registry ist eine unveraenderliche Python-Allowlist ohne dynamische
+Imports, Skriptpfade, Verzeichnissuche oder Laufzeit-Downloads. Der Workflow
+leitet die benoetigten Berechtigungen aus dem typisierten Plan ab und stoppt
+vor Modellaufruf beziehungsweise Quellzugriff, wenn eine benoetigte Capability
+fehlt.
 
 Der Verifier prueft mindestens:
 
@@ -222,6 +230,7 @@ Portabilitaetspruefung erstellt.
 
 ## Naechster konkreter Schritt
 
-Als verbleibender Teil von Phase 5 wird die kleine statische Capability
-Registry aufgebaut. Der lokale `spreadsheet-analysis`-Skill folgt erst auf
-dieser nun auch durch den Ergebnis-Verifier geschuetzten Basis.
+Phase 6 vergleicht die geschuetzten Tabellenworkflows mit kontrollierten
+Generatoren und dem vorhandenen lokalen Qwen-Modell. Der projektlokale
+`spreadsheet-analysis`-Skill folgt spaeter auf der nun durch Registry und
+Ergebnis-Verifier geschuetzten Basis.

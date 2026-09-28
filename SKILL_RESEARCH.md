@@ -116,14 +116,13 @@ Grenzen zu umgehen.
 
 ## Naechste Implementierungsmigration
 
-Die Regressionstests, Entitaetsaufloesung, Filter-vor-Aggregation und der
-deterministische Ergebnis-Verifier sind abgeschlossen. Als naechste Migration
-folgen:
+Die Regressionstests, Entitaetsaufloesung, Filter-vor-Aggregation, der
+deterministische Ergebnis-Verifier und die statische Capability Registry sind
+abgeschlossen. Als naechste Migrationen folgen:
 
-1. Die kleine statische Capability Registry einfuehren.
-2. Darauf den projektlokalen `spreadsheet-analysis`-Skill aufbauen.
-3. Verhalten mit kontrollierten Generatoren und dem lokalen Qwen-Modell
+1. Verhalten mit kontrollierten Generatoren und dem lokalen Qwen-Modell
    vergleichen; unzuverlaessige Schritte bleiben deterministisch.
+2. Darauf den projektlokalen `spreadsheet-analysis`-Skill aufbauen.
 
 ## Abnahmekriterien
 

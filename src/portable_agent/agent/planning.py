@@ -6,6 +6,11 @@ from collections.abc import Mapping
 from typing import Any, Protocol
 
 from portable_agent.analysis import execute_verified_table_plan
+from portable_agent.capabilities import (
+    DEFAULT_CAPABILITY_REGISTRY,
+    CapabilityRegistry,
+    require_temporal_capability,
+)
 from portable_agent.domain import (
     ClarificationRequest,
     EntityClarificationRequest,
@@ -48,10 +53,12 @@ def answer_table_question(
     *,
     semantic_definitions: Mapping[str, str] | None = None,
     semantic_catalog: SemanticCatalog | None = None,
+    capability_registry: CapabilityRegistry = DEFAULT_CAPABILITY_REGISTRY,
 ) -> QueryResult | ClarificationRequest | EntityClarificationRequest:
     """Generate, decode, validate and execute a table plan with citations."""
     if not isinstance(question, str) or not question.strip():
         raise TableQuestionError("Die Frage darf nicht leer sein.")
+    capability_registry.require("table.inspect")
     if not source.columns:
         raise TableQuestionError("Die Tabellenquelle hat keine Spalten.")
 
@@ -63,6 +70,7 @@ def answer_table_question(
     }
     clean_question = question.strip()
     if semantic_catalog is not None:
+        capability_registry.require("table.resolve_entity")
         explicit_total_plan = build_explicit_total_plan(
             source,
             clean_question,
@@ -76,7 +84,11 @@ def answer_table_question(
                 semantic_catalog,
             )
             return attach_result_semantics(
-                execute_verified_table_plan(source, explicit_total_plan),
+                execute_verified_table_plan(
+                    source,
+                    explicit_total_plan,
+                    capability_registry=capability_registry,
+                ),
                 explicit_total_plan,
                 semantic_catalog,
                 tuple(source.columns),
@@ -92,9 +104,14 @@ def answer_table_question(
         if isinstance(temporal_plan, EntityClarificationRequest):
             return temporal_plan
         if temporal_plan is not None:
+            require_temporal_capability(capability_registry, temporal_plan)
             apply_semantic_policy(source, temporal_plan, clean_question, semantic_catalog)
             return attach_result_semantics(
-                execute_verified_table_plan(source, temporal_plan),
+                execute_verified_table_plan(
+                    source,
+                    temporal_plan,
+                    capability_registry=capability_registry,
+                ),
                 temporal_plan,
                 semantic_catalog,
                 tuple(source.columns),
@@ -108,7 +125,11 @@ def answer_table_question(
         )
         try:
             if semantic_catalog is None:
-                return run_table_query(source, payload)
+                return run_table_query(
+                    source,
+                    payload,
+                    capability_registry=capability_registry,
+                )
 
             plan = query_plan_from_dict(payload)
             plan = normalize_semantic_filters(source, plan, semantic_catalog)
@@ -121,7 +142,11 @@ def answer_table_question(
             if clarification is not None:
                 return clarification
             return attach_result_semantics(
-                execute_verified_table_plan(source, plan),
+                execute_verified_table_plan(
+                    source,
+                    plan,
+                    capability_registry=capability_registry,
+                ),
                 plan,
                 semantic_catalog,
                 tuple(source.columns),

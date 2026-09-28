@@ -16,6 +16,8 @@ Es gibt keine Cloud-LLMs, Telemetrie oder Cloud-Fallbacks.
 - Dokumente und Tabellen nur nach ausdruecklicher Auswahl read-only oeffnen;
 - Fragen mit nachvollziehbaren Seiten-, Absatz- oder Zeilenbelegen beantworten;
 - Tabellenabfragen ueber validierte Plaene deterministisch berechnen;
+- Tabellenoperationen ueber eine feste read-only Capability-Allowlist
+  begrenzen und jedes Ergebnis vor der Ausgabe unabhaengig verifizieren;
 - ein lokales llama.cpp-Modell ohne Cloud-Verbindung verwenden;
 - Dokument-Sessions nur temporaer im Arbeitsspeicher halten;
 - bestaetigte Wissensnotizen getrennt in SQLite speichern;
@@ -78,6 +80,7 @@ examples/synthetic/     erfundene Beispieldaten
 src/portable_agent/
   agent/                lokale Workflows und Orchestrierung
   analysis/             deterministische Tabellenberechnung
+  capabilities/         statische read-only Operations-Allowlist
   citations/            Quellenmodelle
   llm/                  lokaler llama.cpp-Adapter
   memory/               bestaetigtes SQLite-Wissen

@@ -5,6 +5,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from portable_agent.analysis import execute_verified_table_plan
+from portable_agent.capabilities import (
+    DEFAULT_CAPABILITY_REGISTRY,
+    CapabilityRegistry,
+    require_temporal_capability,
+)
 from portable_agent.domain import (
     ClarificationRequest,
     EntityClarificationRequest,
@@ -28,6 +33,7 @@ class TableAgent:
     source: TableSource
     generator: PlanGenerator
     catalog: SemanticCatalog
+    capability_registry: CapabilityRegistry = DEFAULT_CAPABILITY_REGISTRY
 
     @classmethod
     def with_default_catalog(
@@ -40,6 +46,7 @@ class TableAgent:
             source=source,
             generator=generator,
             catalog=load_default_semantic_catalog(),
+            capability_registry=DEFAULT_CAPABILITY_REGISTRY,
         )
 
     def ask(
@@ -53,6 +60,7 @@ class TableAgent:
             self.generator,
             semantic_definitions=definitions,
             semantic_catalog=self.catalog,
+            capability_registry=self.capability_registry,
         )
 
     def resolve(
@@ -62,8 +70,15 @@ class TableAgent:
     ) -> QueryResult:
         """Execute a selected clarification option without another LLM call."""
         plan = resolve_clarification(request, option_id)
+        if isinstance(request, EntityClarificationRequest):
+            self.capability_registry.require("table.resolve_entity")
+            require_temporal_capability(self.capability_registry, plan)
         return attach_result_semantics(
-            execute_verified_table_plan(self.source, plan),
+            execute_verified_table_plan(
+                self.source,
+                plan,
+                capability_registry=self.capability_registry,
+            ),
             plan,
             self.catalog,
             tuple(self.source.columns),

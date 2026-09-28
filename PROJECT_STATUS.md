@@ -36,6 +36,10 @@ weder Laufzeitabhaengigkeit noch Bestandteil dieses Repositories.
   Gruppierung, Sortierung, Limits, Metadaten und exakte Zeilenbelege;
 - vertrauenswuerdige interne Pflichtfilter fuer lokal aufgeloeste Entitaeten,
   die nicht durch Modell-JSON gesetzt werden koennen;
+- unveraenderliche Capability Registry mit genau acht bekannten read-only
+  Tabellen- und Verifikationsoperationen;
+- fail-closed Capability-Pruefung vor Modellaufruf und Tabellenberechnung,
+  ohne dynamische Imports, Skill-Suche, Skripte oder Downloads;
 - portable Windows-Startdiagnose und relative Anwendungspfade;
 - synthetische Beispieltabellen und -dokumente unter `examples/synthetic/`.
 
@@ -55,7 +59,7 @@ weder Laufzeitabhaengigkeit noch Bestandteil dieses Repositories.
 
 ## Verifikation
 
-Alle **260 synthetischen Unit- und Integrationstests** laufen mit der
+Alle **268 synthetischen Unit- und Integrationstests** laufen mit der
 portablen Projektlaufzeit erfolgreich. `start.bat --check` bestaetigt die
 portable Runtime. Die Tests lesen keine externen Dateien und keine Nutzdaten.
 
@@ -112,9 +116,10 @@ Abhaengigkeiten, Offline-Eignung und Lizenzlage untersucht. Die Ergebnisse und
 Quellen stehen in `SKILL_RESEARCH.md`.
 
 PortableAgent nutzt den `SKILL.md`-Aufbau nur als lokale Verpackungs- und
-Dokumentationskonvention. Eine kleine statische Registry wird ausschliesslich
-mitgelieferte Skills auf registrierte, typisierte und read-only Capabilities
-abbilden. Es gibt keine Skill-Downloads, keine offene Katalogsuche und keine
+Dokumentationskonvention. Die implementierte statische Registry erlaubt genau
+acht bekannte, typisierte und read-only Tabellen-Capabilities. Kuenftige
+mitgelieferte Skills duerfen nur diese registrierten Operationen anfordern.
+Es gibt keine Skill-Downloads, keine offene Katalogsuche und keine
 freie Skript-, Shell- oder Netzwerkausfuehrung. Proprietäre Anthropic-
 Dokument-Skills und davon abgeleitete Repositories werden nicht kopiert.
 Erste Referenzimplementierung wird `spreadsheet-analysis`; bestehende Parser,
@@ -135,12 +140,21 @@ Analyseplaene, Python-Engine und Quellenbelege bleiben Grundlage.
 ## Naechste Schritte
 
 1. physischen Portabilitaets-Smoke-Test durchfuehren;
-2. die statische Capability Registry und danach den lokalen
-   `spreadsheet-analysis`-Skill aufbauen;
-3. v0.1-Release erst nach abgeschlossenem Sicherheits- und Lizenzabgleich
+2. die geschuetzten Workflows mit dem lokalen Qwen-Modell evaluieren;
+3. danach den lokalen `spreadsheet-analysis`-Skill aufbauen;
+4. v0.1-Release erst nach abgeschlossenem Sicherheits- und Lizenzabgleich
    veroeffentlichen.
 
 ## Letzter abgeschlossener Entwicklungsschritt
+
+Phase 5 ist vollstaendig abgeschlossen. Eine unveraenderliche, im Quellcode
+definierte Capability Registry erlaubt ausschliesslich `table.inspect`,
+`table.resolve_entity`, `table.filter`, `table.aggregate`,
+`table.first_occurrence`, `table.last_occurrence`, `table.source_rows` und
+`result.verify`. Es gibt keine dynamischen Implementierungspfade und keine
+Moeglichkeit, ueber Metadaten Shell-, Netzwerk- oder Schreiboperationen
+freizuschalten. Fehlende Berechtigungen stoppen sicher vor der jeweiligen
+Operation.
 
 Jeder produktive Tabellen-Antwortpfad fuehrt jetzt nach der Berechnung und vor
 der Ausgabe einen unabhaengigen, deterministischen Ergebnis-Verifier aus.
@@ -167,5 +181,5 @@ ausgewaehlte Excel-Tabellenblaetter sind abgedeckt. Aehnliche Namen und
 Tippfehler erzeugen eine lokal aufloesbare, typisierte Rueckfrage in API und
 Weboberflaeche; unbekannte Aktionen stoppen sicher vor einem Modellaufruf.
 Zellwerte werden weiterhin niemals an das Modell uebergeben und die
-Quelldatei bleibt unveraendert. Die synthetische Testsuite umfasst jetzt 260
+Quelldatei bleibt unveraendert. Die synthetische Testsuite umfasst jetzt 268
 erfolgreiche Tests.

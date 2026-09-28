@@ -7,8 +7,8 @@ Unterordner.
 
 Wenn der Benutzer `update dich` schreibt, vor allen anderen Arbeiten:
 
-1. `PROJECT_STATUS.md`, `ROADMAP.md`, `SPEC.md` und `SKILL_RESEARCH.md`
-   vollstaendig lesen.
+1. `README.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `SPEC.md` und
+   `SKILL_RESEARCH.md` vollstaendig lesen.
 2. Den aktuellen Git-Status, den aktiven Branch und die letzten Commits
    pruefen.
 3. Vorhandene Aenderungen respektieren und nichts veraendern.
@@ -18,6 +18,19 @@ Wenn der Benutzer `update dich` schreibt, vor allen anderen Arbeiten:
 
 Falls eine der genannten Dateien fehlt oder Git nicht zum dokumentierten Stand
 passt, die Abweichung deutlich nennen und nicht eigenmaechtig korrigieren.
+
+Wenn der Benutzer `save` schreibt:
+
+1. Die aktuellen Aenderungen und ihren dokumentierten Projektstand pruefen.
+2. `README.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `SPEC.md` und
+   `SKILL_RESEARCH.md` nur dort aktualisieren, wo neue Funktionen, Grenzen,
+   Testergebnisse oder naechste Schritte den Inhalt tatsaechlich veraendern.
+3. Angemessene synthetische Tests und die portable Startpruefung ausfuehren.
+4. Vor dem Speichern sicherstellen, dass keine Runtime, Modelle, Memory,
+   Sitzungs- oder Nutzdaten aufgenommen werden.
+5. Den geprueften Stand im vorgesehenen Git-Branch sichern und den
+   Pull-Request-/CI-Ablauf bis zum synchronisierten `main` abschliessen, sofern
+   der Benutzer nicht ausdruecklich nur eine lokale Speicherung verlangt.
 
 ## Projektgrenzen
 

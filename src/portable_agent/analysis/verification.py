@@ -8,6 +8,11 @@ from numbers import Number
 from types import MappingProxyType
 from typing import Any
 
+from portable_agent.capabilities import (
+    DEFAULT_CAPABILITY_REGISTRY,
+    CapabilityRegistry,
+    required_execution_capabilities,
+)
 from portable_agent.domain import Calculation, Filter, QueryPlan, QueryResult
 from portable_agent.plans import validate_plan
 from portable_agent.sources import TableRow, TableSource
@@ -19,8 +24,14 @@ class ResultVerificationError(RuntimeError):
     """A calculated result does not agree with its plan, rows or evidence."""
 
 
-def execute_verified_table_plan(source: TableSource, plan: QueryPlan) -> QueryResult:
+def execute_verified_table_plan(
+    source: TableSource,
+    plan: QueryPlan,
+    *,
+    capability_registry: CapabilityRegistry = DEFAULT_CAPABILITY_REGISTRY,
+) -> QueryResult:
     """Execute one plan and reject any result that cannot be reproduced."""
+    capability_registry.require(*required_execution_capabilities(plan))
     snapshot = _SnapshotTableSource(
         tuple(source.columns),
         tuple(
