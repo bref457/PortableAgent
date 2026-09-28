@@ -1,7 +1,7 @@
 # PortableAgent Spezifikation
 
 Status: Architektur-Baseline fuer v0.1  
-Stand: 27.09.2026
+Stand: 28.09.2026
 
 ## Ziel
 
@@ -60,6 +60,21 @@ lokales llama.cpp + GGUF
   Limits;
 - strikte Validierung gegen reale Quellfelder und erlaubte Operationen;
 - keine freie Codeausfuehrung.
+
+### Lokale Skills und Capabilities
+
+- projektlokale Skills verwenden den offenen `SKILL.md`-Aufbau als
+  Verpackungs- und Dokumentationskonvention;
+- eine statische Registry erlaubt nur mitgelieferte, gepruefte Skills und
+  ordnet sie registrierten, typisierten Capabilities zu;
+- Dateityp und Skill-Familie werden deterministisch gewaehlt, waehrend das
+  lokale Modell nur Absicht, Entitaet, Filter und Kennzahl interpretiert;
+- Skills koennen weder Shell noch Netzwerk, Paketinstallation, freie
+  Dateisystemzugriffe oder schreibende Quelldateioperationen ausloesen;
+- Skill-Anweisungen koennen Planvalidierung, Allowlist, Verifier und
+  Quellenpflicht nicht erweitern;
+- erster Referenz-Skill ist `spreadsheet-analysis`; Details und
+  Lizenzentscheidungen stehen in `SKILL_RESEARCH.md`.
 
 ### Sources
 

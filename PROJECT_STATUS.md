@@ -1,6 +1,6 @@
 # PortableAgent Projektstatus
 
-Stand: 27.09.2026
+Stand: 28.09.2026
 
 ## Status
 
@@ -95,6 +95,26 @@ Dokumentdaten wurden nicht uebernommen.
 - Branch-Schutz fuer `main` mit Pull Request, den beiden synthetischen CI-
   Checks und verpflichtender Conversation-Aufloesung; Administrator-Bypass
   bleibt fuer die Einzelbetreuung aktiviert.
+- GitHub Secret Scanning mit Push Protection, Dependabot Security Updates und
+  private Meldungen von Sicherheitsluecken sind aktiviert.
+- Repository-Beschreibung und Topics kennzeichnen das Projekt als lokale,
+  offline-first Dokument- und Tabellenanalyse.
+
+## Skill-Recherche und Architekturentscheid
+
+Die oeffentliche Agent-Skills-Spezifikation, OpenAI-Beispiele, Anthropics
+Dokument-Skills und `appautomaton/document-SKILLs` wurden auf Workflow,
+Abhaengigkeiten, Offline-Eignung und Lizenzlage untersucht. Die Ergebnisse und
+Quellen stehen in `SKILL_RESEARCH.md`.
+
+PortableAgent nutzt den `SKILL.md`-Aufbau nur als lokale Verpackungs- und
+Dokumentationskonvention. Eine kleine statische Registry wird ausschliesslich
+mitgelieferte Skills auf registrierte, typisierte und read-only Capabilities
+abbilden. Es gibt keine Skill-Downloads, keine offene Katalogsuche und keine
+freie Skript-, Shell- oder Netzwerkausfuehrung. Proprietäre Anthropic-
+Dokument-Skills und davon abgeleitete Repositories werden nicht kopiert.
+Erste Referenzimplementierung wird `spreadsheet-analysis`; bestehende Parser,
+Analyseplaene, Python-Engine und Quellenbelege bleiben Grundlage.
 
 ## Aktuelle Grenzen
 
@@ -111,9 +131,13 @@ Dokumentdaten wurden nicht uebernommen.
 ## Naechste Schritte
 
 1. physischen Portabilitaets-Smoke-Test durchfuehren;
-2. GitHub-Repository-Metadaten (Beschreibung und Topics) speichern;
-3. private Vulnerability-Reporting-Funktion in GitHub pruefen;
-4. v0.1-Release erst nach abgeschlossenem Sicherheits- und Lizenzabgleich
+2. synthetische Regressionstests fuer aktionsbezogene erste und letzte
+   Vorkommen ergaenzen;
+3. Entitaetsaufloesung, Filter-vor-Aggregation und Ergebnis-Verifier
+   implementieren;
+4. darauf die statische Registry und den lokalen
+   `spreadsheet-analysis`-Skill aufbauen;
+5. v0.1-Release erst nach abgeschlossenem Sicherheits- und Lizenzabgleich
    veroeffentlichen.
 
 ## Letzter abgeschlossener Entwicklungsschritt
