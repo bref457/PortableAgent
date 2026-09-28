@@ -5,7 +5,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from portable_agent.analysis import execute_table_plan
-from portable_agent.domain import ClarificationRequest, QueryResult
+from portable_agent.domain import (
+    ClarificationRequest,
+    EntityClarificationRequest,
+    QueryResult,
+)
 from portable_agent.semantics import (
     SemanticCatalog,
     attach_result_semantics,
@@ -38,7 +42,10 @@ class TableAgent:
             catalog=load_default_semantic_catalog(),
         )
 
-    def ask(self, question: str) -> QueryResult | ClarificationRequest:
+    def ask(
+        self,
+        question: str,
+    ) -> QueryResult | ClarificationRequest | EntityClarificationRequest:
         definitions = self.catalog.definitions_for_columns(self.source.columns)
         return answer_table_question(
             self.source,
@@ -50,7 +57,7 @@ class TableAgent:
 
     def resolve(
         self,
-        request: ClarificationRequest,
+        request: ClarificationRequest | EntityClarificationRequest,
         option_id: str,
     ) -> QueryResult:
         """Execute a selected clarification option without another LLM call."""

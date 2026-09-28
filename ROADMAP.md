@@ -5,7 +5,7 @@ Stand: 28.09.2026
 ## Ausgangslage
 
 - Der lokale Projektstamm ist der massgebliche aktuelle Entwicklungsstand.
-- Die lokale synthetische Testsuite umfasst 230 erfolgreiche Tests.
+- Die lokale synthetische Testsuite umfasst 243 erfolgreiche Tests.
 - Der lokale 230-Test-Stand wurde nachvollziehbar wieder in Git aufgenommen,
   per Pull Request geprueft und in `main` zusammengefuehrt.
 - Runtime, Modell, Memory, Sitzungsdaten und Nutzdaten bleiben von Git
@@ -20,7 +20,9 @@ Stand: 28.09.2026
 - Phase 3 ist entschieden: eine kleine statische Capability Registry und
   projektlokale, gepruefte Skills statt eines allgemeinen
   Ausfuehrungsframeworks.
-- Naechster Entwicklungsschritt ist Phase 4.
+- Phase 4 ist abgeschlossen: aktionsbezogene erste und letzte Vorkommen werden
+  lokal aufgeloest, vor der Datumsaggregation gefiltert und belegt.
+- Naechster Entwicklungsschritt ist Phase 5.
 
 ## Verbindliche Leitlinien
 
@@ -111,6 +113,8 @@ Rahmenbedingungen:
   bewertet.
 
 ## Phase 4: Excel als Referenzimplementierung stabilisieren
+
+Status: abgeschlossen am 28.09.2026.
 
 Der erste Workflow ist `spreadsheet-analysis`. Zuerst entstehen synthetische
 Regressionstests fuer natuerliche Varianten wie:
@@ -214,7 +218,6 @@ Portabilitaetspruefung erstellt.
 
 ## Naechster konkreter Schritt
 
-Phase 4 beginnt mit synthetischen Regressionstests fuer aktionsbezogene erste
-und letzte Vorkommen. Danach folgen Entitaetsaufloesung,
-Filter-vor-Aggregation und der Ergebnis-Verifier. Die kleine Registry wird
-erst auf diesem geprueften Workflow aufgebaut.
+Phase 5 beginnt mit einem expliziten Ergebnis-Verifier fuer den nun geprueften
+Workflow. Danach wird die kleine Capability Registry aufgebaut. Der lokale
+`spreadsheet-analysis`-Skill folgt erst auf dieser deterministischen Basis.

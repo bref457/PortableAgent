@@ -133,6 +133,50 @@ class TableJsonControllerTests(unittest.TestCase):
         )
         self.assertEqual(len(generator.calls), 1)
 
+    def test_entity_clarification_is_serialized_and_resolved_without_model(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "actions.csv"
+            path.write_text(
+                "Datum;Aktion\n"
+                "2024-03-02;ALPHA NORD\n"
+                "2024-02-01;ALPHA SUED\n",
+                encoding="utf-8",
+            )
+            generator = RecordingGenerator({})
+            workflow = TableWorkflow(
+                generator,
+                id_factory=lambda: "entity-clarification",
+            )
+            controller = TableJsonController(workflow)
+
+            response = self.request(controller, {
+                "operation": "ask_table",
+                "path": str(path),
+                "question": "Wann war ALPHA erstmals?",
+            })
+            resolved = self.request(controller, {
+                "operation": "resolve_table",
+                "clarification_id": "entity-clarification",
+                "option_id": "entity-2",
+            })
+
+        result = response["result"]
+        self.assertEqual(result["type"], "clarification")
+        self.assertEqual(result["clarification_kind"], "entity")
+        self.assertEqual(result["candidate_count"], 2)
+        self.assertEqual(result["column"], "Aktion")
+        self.assertEqual(
+            [option["label"] for option in result["options"]],
+            ["ALPHA NORD", "ALPHA SUED"],
+        )
+        self.assertNotIn("value", result["options"][0])
+        self.assertNotIn("original_plan", result)
+        self.assertEqual(
+            resolved["result"]["values"],
+            {"Erster Einsatz": "2024-02-01"},
+        )
+        self.assertEqual(generator.calls, [])
+
     def test_invalid_fields_fail_before_the_workflow_is_called(self):
         generator = RecordingGenerator({
             "calculations": [{"label": "Zeilen", "aggregation": "count"}]
