@@ -25,6 +25,29 @@ def validate_plan(plan: QueryPlan, available_columns: set[str]) -> None:
         if item.op not in FILTER_OPERATORS:
             raise PlanValidationError(f"Unbekannter Filteroperator: {item.op}")
 
+    for item in plan.required_filters:
+        if item.column not in available_columns:
+            raise PlanValidationError(
+                f"Unbekannte erforderliche Filterspalte: {item.column}"
+            )
+        if item.op not in FILTER_OPERATORS:
+            raise PlanValidationError(
+                f"Unbekannter erforderlicher Filteroperator: {item.op}"
+            )
+        if (
+            item.op != "=="
+            or type(item.value) is not str
+            or not item.value.strip()
+        ):
+            raise PlanValidationError(
+                "Erforderliche Entitaetsfilter muessen eine exakte, "
+                "nicht leere Textgleichheit sein."
+            )
+        if item not in plan.filters:
+            raise PlanValidationError(
+                f"Erforderlicher Filter fuer '{item.column}' fehlt im Plan."
+            )
+
     for item in plan.calculations:
         if item.aggregation not in AGGREGATIONS:
             raise PlanValidationError(f"Unbekannte Aggregation: {item.aggregation}")
@@ -49,4 +72,3 @@ def validate_plan(plan: QueryPlan, available_columns: set[str]) -> None:
         raise PlanValidationError(
             f"Limit muss zwischen 1 und {MAX_RESULT_LIMIT} liegen."
         )
-

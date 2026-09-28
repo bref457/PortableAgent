@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from portable_agent.analysis import execute_table_plan
+from portable_agent.analysis import execute_verified_table_plan
 from portable_agent.domain import (
     ClarificationRequest,
     EntityClarificationRequest,
@@ -63,7 +63,7 @@ class TableAgent:
         """Execute a selected clarification option without another LLM call."""
         plan = resolve_clarification(request, option_id)
         return attach_result_semantics(
-            execute_table_plan(self.source, plan),
+            execute_verified_table_plan(self.source, plan),
             plan,
             self.catalog,
             tuple(self.source.columns),

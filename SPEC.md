@@ -89,6 +89,12 @@ lokales llama.cpp + GGUF
   aufgeloest und gefiltert, bevor `min` beziehungsweise `max` berechnet wird;
 - aehnliche Namen und Tippfehler werden nicht still angenommen, sondern als
   typisierte lokale Rueckfrage ausgegeben;
+- jeder produktive Tabellenplan wird aus einem unveraenderlichen
+  Zeilen-Snapshot berechnet und vor der Ausgabe unabhaengig verifiziert;
+- der Verifier rekonstruiert Ergebnis, Filtermenge, Gruppen, Sortierung,
+  Limits, Metadaten und die exakt notwendigen `SourceRef`-Belege;
+- fehlgeschlagene Verifikation verwirft das gesamte Ergebnis ohne
+  Modellwiederholung oder Ersatzantwort;
 - DuckDB erst spaeter optional, wenn reproduzierbare Leistungstests einen
   konkreten Bedarf belegen;
 - reproduzierbare Ergebnisse und explizite Rechenschritte;
