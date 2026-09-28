@@ -18,5 +18,9 @@
 - Zu Beginn einer uebernommenen Arbeit `update dich` gemaess `AGENTS.md`
   ausfuehren. Vor einer dauerhaften Sicherung die dort definierte `save`-Regel
   anwenden.
+- Nach eigener materieller Arbeit vor der Rueckgabe an den Benutzer den
+  Abschnitt `Bidirektionale Agenten-Uebergabe` in `AGENTS.md` ausfuehren. So
+  kann Codex spaeter ausschliesslich aus Git und den gemeinsamen
+  Projektdateien verlaesslich weiterarbeiten.
 - Mit `/context` kann geprueft werden, ob diese Datei und der Import von
   `AGENTS.md` geladen wurden.

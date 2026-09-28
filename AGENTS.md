@@ -7,8 +7,8 @@ Unterordner.
 
 Wenn der Benutzer `update dich` schreibt, vor allen anderen Arbeiten:
 
-1. `CLAUDE.md`, `README.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `SPEC.md` und
-   `SKILL_RESEARCH.md` vollstaendig lesen.
+1. `AGENTS.md`, `CLAUDE.md`, `README.md`, `PROJECT_STATUS.md`, `ROADMAP.md`,
+   `SPEC.md` und `SKILL_RESEARCH.md` vollstaendig lesen.
 2. Den aktuellen Git-Status, den aktiven Branch und die letzten Commits
    pruefen.
 3. Vorhandene Aenderungen respektieren und nichts veraendern.
@@ -32,6 +32,37 @@ Wenn der Benutzer `save` schreibt:
 5. Den geprueften Stand im vorgesehenen Git-Branch sichern und den
    Pull-Request-/CI-Ablauf bis zum synchronisierten `main` abschliessen, sofern
    der Benutzer nicht ausdruecklich nur eine lokale Speicherung verlangt.
+
+## Bidirektionale Agenten-Uebergabe
+
+Diese Regeln gelten gleichermassen fuer Codex, Claude Code und jeden anderen
+Coding Agent:
+
+1. Vor der Uebernahme einer bestehenden Arbeit mit `update dich` den
+   versionierten Projektstand und Git-Zustand einlesen.
+2. Nach jeder materiellen Aenderung und vor einer Uebergabe oder dem Ende der
+   Arbeit die gemeinsam relevanten Informationen aktualisieren:
+   - `PROJECT_STATUS.md`: tatsaechlich implementierter und verifizierter Stand,
+     bekannte Grenzen und letzter abgeschlossener Schritt;
+   - `ROADMAP.md`: abgeschlossene Phase und naechster konkreter Schritt;
+   - `SPEC.md`: neue oder geaenderte Architektur- und Sicherheitsentscheide;
+   - `SKILL_RESEARCH.md`: neue Skill-, Quellen- oder Lizenzentscheide;
+   - `README.md`: fuer Benutzer oder Mitwirkende sichtbare Aenderungen;
+   - `AGENTS.md`: neue gemeinsame Arbeitsregeln.
+3. Nur Claude-spezifische Hinweise in `CLAUDE.md` festhalten. Gemeinsame
+   Informationen duerfen nicht ausschliesslich dort stehen.
+4. Nur belegte Tatsachen dokumentieren. Offene Arbeiten, fehlgeschlagene Tests,
+   uncommittete Aenderungen und Blocker deutlich als solche kennzeichnen.
+5. Vor der Uebergabe nach Moeglichkeit `save` ausfuehren. Falls noch nicht
+   gespeichert werden darf oder kann, den exakten Branch, Git-Zustand, bereits
+   ausgefuehrte Pruefungen und naechsten Schritt in `PROJECT_STATUS.md`
+   festhalten.
+6. Der nachfolgende Agent beginnt wieder mit `update dich`. Damit gilt derselbe
+   Ablauf ausdruecklich in beide Richtungen: Codex -> Projektdateien -> Claude
+   Code und Claude Code -> Projektdateien -> Codex.
+
+Chatverlaeufe, Codex-Kontext und Claude Auto Memory sind nur ergaenzend und
+niemals die einzige Uebergabequelle.
 
 ## Projektgrenzen
 

@@ -109,8 +109,11 @@ Dokumentdaten wurden nicht uebernommen.
   offline-first Dokument- und Tabellenanalyse.
 - `AGENTS.md` ist die gemeinsame versionierte Regelquelle fuer Coding Agents;
   `CLAUDE.md` importiert sie fuer eine verlustarme Uebergabe an Claude Code.
-  Dauerhafte Projektinformationen werden nicht nur in Chatverlaeufen oder
-  agentenspezifischem Auto Memory gehalten.
+  Die Uebergabe ist ausdruecklich bidirektional: Codex und Claude Code muessen
+  materielle Fortschritte, Pruefungen, Grenzen und naechste Schritte in den
+  gemeinsamen Projektdateien hinterlassen. Dauerhafte Projektinformationen
+  werden nicht nur in Chatverlaeufen oder agentenspezifischem Auto Memory
+  gehalten.
 
 ## Skill-Recherche und Architekturentscheid
 
