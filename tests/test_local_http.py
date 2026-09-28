@@ -432,7 +432,7 @@ class LocalHttpTests(unittest.TestCase):
                 LlamaCppResponseError("SYNTHETIC_PRIVATE_RESPONSE_DETAIL"),
                 502,
                 "invalid_local_model_response",
-                "keine gueltige Antwort",
+                "keine gültige Antwort",
             ),
         )
         with tempfile.TemporaryDirectory() as temporary:

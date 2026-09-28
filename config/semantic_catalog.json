@@ -19,6 +19,24 @@
       "allowed_operations": ["filter", "group", "min", "max"]
     },
     {
+      "canonical_name": "von",
+      "aliases": ["von", "Beginn", "Startzeit"],
+      "role": "dimension",
+      "data_type": "time",
+      "description": "Beginn des Einsatzes als Uhrzeit beziehungsweise Dezimalstunde seit Mitternacht",
+      "unit": "Uhrzeit",
+      "allowed_operations": ["filter", "min", "max"]
+    },
+    {
+      "canonical_name": "bis",
+      "aliases": ["bis", "Ende", "Endzeit"],
+      "role": "dimension",
+      "data_type": "time",
+      "description": "Ende des Einsatzes als Uhrzeit beziehungsweise Dezimalstunde seit Mitternacht",
+      "unit": "Uhrzeit",
+      "allowed_operations": ["filter", "min", "max"]
+    },
+    {
       "canonical_name": "FIX",
       "aliases": ["FIX", "Fix", "SF Mitarbeiter", "SF-Mitarbeiter", "Festangestellte"],
       "role": "measure",
@@ -104,4 +122,3 @@
     }
   ]
 }
-

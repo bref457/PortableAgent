@@ -11,7 +11,10 @@ from portable_agent.plans import PlanDecodeError, PlanValidationError, query_pla
 from portable_agent.semantics import (
     SemanticCatalog,
     apply_semantic_policy,
+    attach_result_semantics,
+    build_explicit_total_plan,
     build_temporal_extreme_plan,
+    normalize_semantic_filters,
 )
 from portable_agent.sources import TableSource
 
@@ -55,6 +58,24 @@ def answer_table_question(
     }
     clean_question = question.strip()
     if semantic_catalog is not None:
+        explicit_total_plan = build_explicit_total_plan(
+            source,
+            clean_question,
+            semantic_catalog,
+        )
+        if explicit_total_plan is not None:
+            apply_semantic_policy(
+                source,
+                explicit_total_plan,
+                clean_question,
+                semantic_catalog,
+            )
+            return attach_result_semantics(
+                execute_table_plan(source, explicit_total_plan),
+                explicit_total_plan,
+                semantic_catalog,
+                tuple(source.columns),
+            )
         temporal_plan = build_temporal_extreme_plan(
             clean_question,
             tuple(source.columns),
@@ -62,7 +83,12 @@ def answer_table_question(
         )
         if temporal_plan is not None:
             apply_semantic_policy(source, temporal_plan, clean_question, semantic_catalog)
-            return execute_table_plan(source, temporal_plan)
+            return attach_result_semantics(
+                execute_table_plan(source, temporal_plan),
+                temporal_plan,
+                semantic_catalog,
+                tuple(source.columns),
+            )
 
     for attempt in range(2):
         payload = generator.generate_plan(
@@ -75,6 +101,7 @@ def answer_table_question(
                 return run_table_query(source, payload)
 
             plan = query_plan_from_dict(payload)
+            plan = normalize_semantic_filters(source, plan, semantic_catalog)
             clarification = apply_semantic_policy(
                 source,
                 plan,
@@ -83,11 +110,16 @@ def answer_table_question(
             )
             if clarification is not None:
                 return clarification
-            return execute_table_plan(source, plan)
+            return attach_result_semantics(
+                execute_table_plan(source, plan),
+                plan,
+                semantic_catalog,
+                tuple(source.columns),
+            )
         except (PlanDecodeError, PlanValidationError) as exc:
             if attempt == 1:
                 raise TableQuestionError(
-                    "Das lokale Modell lieferte keinen gueltigen Tabellenplan. "
+                    "Das lokale Modell lieferte keinen gültigen Tabellenplan. "
                     "Bitte formuliere deine Frage eindeutiger."
                 ) from exc
 

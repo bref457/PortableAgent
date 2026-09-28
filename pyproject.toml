@@ -40,4 +40,3 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 "portable_agent.web" = ["static/*.html", "static/*.css", "static/*.js"]
-

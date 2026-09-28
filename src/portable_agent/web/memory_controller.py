@@ -95,7 +95,7 @@ def _decode_request(request_json: Any, max_chars: int) -> dict[str, Any]:
         raise MemoryJsonError("JSON-Request muss eine nicht leere Zeichenkette sein.")
     if len(request_json) > max_chars:
         raise MemoryJsonError(
-            f"JSON-Request ist groesser als das Limit von {max_chars} Zeichen."
+            f"JSON-Request ist größer als das Limit von {max_chars} Zeichen."
         )
     try:
         payload = json.loads(
@@ -104,7 +104,7 @@ def _decode_request(request_json: Any, max_chars: int) -> dict[str, Any]:
             parse_constant=_reject_nonstandard_constant,
         )
     except json.JSONDecodeError as exc:
-        raise MemoryJsonError(f"Ungueltiger JSON-Request: {exc.msg}") from exc
+        raise MemoryJsonError(f"Ungültiger JSON-Request: {exc.msg}") from exc
     if type(payload) is not dict:
         raise MemoryJsonError("JSON-Request muss ein Objekt sein.")
     return payload
@@ -114,7 +114,7 @@ def _object_without_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
     result: dict[str, Any] = {}
     for key, value in pairs:
         if key in result:
-            raise MemoryJsonError(f"JSON-Request enthaelt doppeltes Feld: {key}")
+            raise MemoryJsonError(f"JSON-Request enthält doppeltes Feld: {key}")
         result[key] = value
     return result
 
@@ -133,7 +133,7 @@ def _require_exact_fields(
     unknown = sorted(set(request) - expected)
     if unknown:
         raise MemoryJsonError(
-            f"{operation} enthaelt unbekannte Felder: {', '.join(unknown)}"
+            f"{operation} enthält unbekannte Felder: {', '.join(unknown)}"
         )
     missing = sorted(expected - set(request))
     if missing:

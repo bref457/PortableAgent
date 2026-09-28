@@ -87,6 +87,219 @@ class AgentPlanningTests(unittest.TestCase):
         self.assertIn("Name", captured)
         self.assertIn("Wert", captured)
 
+    def test_duration_results_include_trusted_display_semantics(self):
+        source = InMemoryTableSource([
+            {"Einsatzdauer": 7 + 55 / 60},
+            {"Einsatzdauer": 5},
+        ])
+        generator = FakePlanGenerator({
+            "calculations": [{
+                "label": "Gesamte Einsatzdauer",
+                "aggregation": "sum",
+                "column": "Einsatzdauer",
+            }]
+        })
+
+        result = answer_table_question(
+            source,
+            "Wie hoch war die gesamte Einsatzdauer?",
+            generator,
+            semantic_catalog=load_default_semantic_catalog(),
+        )
+
+        self.assertAlmostEqual(result.values["Gesamte Einsatzdauer"], 12 + 55 / 60)
+        self.assertEqual(result.metadata["value_semantics"], {
+            "Gesamte Einsatzdauer": {
+                "data_type": "duration",
+                "unit": "Stunden",
+            }
+        })
+
+    def test_clock_columns_include_display_semantics_for_cited_rows(self):
+        source = InMemoryTableSource([{"von": 7 + 20 / 60, "bis": 15.25}])
+        generator = FakePlanGenerator({
+            "calculations": [{"label": "Eintraege", "aggregation": "count"}]
+        })
+
+        result = answer_table_question(
+            source,
+            "Wie viele Eintraege gibt es?",
+            generator,
+            semantic_catalog=load_default_semantic_catalog(),
+        )
+
+        self.assertEqual(result.metadata["column_semantics"], {
+            "von": {"data_type": "time", "unit": "Uhrzeit"},
+            "bis": {"data_type": "time", "unit": "Uhrzeit"},
+        })
+
+    def test_text_filter_is_resolved_case_insensitively_from_local_values(self):
+        source = InMemoryTableSource([
+            {"Aktion": "INFLUENTIA", "Einsatzdauer": 5},
+            {"Aktion": "ANDERE", "Einsatzdauer": 2},
+        ])
+        generator = FakePlanGenerator({
+            "filters": [{"column": "Aktion", "op": "==", "value": "Influentia"}],
+            "calculations": [{
+                "label": "Gesamte Einsatzdauer",
+                "aggregation": "sum",
+                "column": "Einsatzdauer",
+            }],
+        })
+
+        result = answer_table_question(
+            source,
+            "Gesamte Einsatzdauer fuer Influentia",
+            generator,
+            semantic_catalog=load_default_semantic_catalog(),
+        )
+
+        self.assertEqual(result.values["Gesamte Einsatzdauer"], 5)
+        self.assertEqual(result.metadata["matched_rows"], 1)
+
+    def test_year_suffix_is_removed_only_with_matching_date_range(self):
+        source = InMemoryTableSource([
+            {"Aktion": "INFLUENTIA", "Datum": "2026-09-08", "Einsatzdauer": 5},
+            {"Aktion": "INFLUENTIA", "Datum": "2025-09-08", "Einsatzdauer": 7},
+        ])
+        generator = FakePlanGenerator({
+            "filters": [
+                {"column": "Aktion", "op": "==", "value": "Influentia 2026"},
+                {"column": "Datum", "op": ">=", "value": "2026-01-01"},
+                {"column": "Datum", "op": "<", "value": "2027-01-01"},
+            ],
+            "calculations": [{
+                "label": "Gesamte Einsatzdauer",
+                "aggregation": "sum",
+                "column": "Einsatzdauer",
+            }],
+        })
+
+        result = answer_table_question(
+            source,
+            "Gesamte Einsatzdauer fuer Influentia 2026",
+            generator,
+            semantic_catalog=load_default_semantic_catalog(),
+        )
+
+        self.assertEqual(result.values["Gesamte Einsatzdauer"], 5)
+        self.assertEqual(result.metadata["matched_rows"], 1)
+
+    def test_year_suffix_is_not_removed_without_matching_date_range(self):
+        source = InMemoryTableSource([
+            {"Aktion": "INFLUENTIA", "Datum": "2026-09-08", "Einsatzdauer": 5},
+        ])
+        generator = FakePlanGenerator({
+            "filters": [{
+                "column": "Aktion",
+                "op": "==",
+                "value": "Influentia 2026",
+            }],
+            "calculations": [{
+                "label": "Gesamte Einsatzdauer",
+                "aggregation": "sum",
+                "column": "Einsatzdauer",
+            }],
+        })
+
+        result = answer_table_question(
+            source,
+            "Gesamte Einsatzdauer fuer Influentia",
+            generator,
+            semantic_catalog=load_default_semantic_catalog(),
+        )
+
+        self.assertIsNone(result.values["Gesamte Einsatzdauer"])
+        self.assertEqual(result.metadata["matched_rows"], 0)
+
+    def test_explicit_total_duration_for_action_and_year_is_deterministic(self):
+        source = InMemoryTableSource([
+            {"Aktion": "INFLUENTIA", "Datum": "2026-09-04", "Einsatzdauer": 7 + 55 / 60},
+            {"Aktion": "INFLUENTIA", "Datum": "2026-09-08", "Einsatzdauer": 5},
+            {"Aktion": "INFLUENTIA", "Datum": "2025-09-08", "Einsatzdauer": 2},
+            {"Aktion": "ANDERE", "Datum": "2026-09-08", "Einsatzdauer": 9},
+        ])
+        generator = FakePlanGenerator({
+            "filters": [{"column": "Aktion", "op": "==", "value": "falsch"}],
+            "calculations": [{"label": "Falsch", "aggregation": "count"}],
+        })
+
+        result = answer_table_question(
+            source,
+            "Wie hoch war die gesamte Einsatzdauer bei Influentia 2026?",
+            generator,
+            semantic_catalog=load_default_semantic_catalog(),
+        )
+
+        self.assertAlmostEqual(result.values["Gesamte Einsatzdauer"], 12 + 55 / 60)
+        self.assertEqual(result.metadata["matched_rows"], 2)
+        self.assertEqual([citation.row for citation in result.citations], [2, 3])
+        self.assertEqual(generator.calls, [])
+
+    def test_natural_quantity_word_uses_only_the_catalog_measure(self):
+        source = InMemoryTableSource([
+            {
+                "Aktion": "INFLUENTIA",
+                "Datum": "2026-09-04",
+                "Einsatzstunden": 47.5,
+                "FIX": 6,
+                "Miliz": 0,
+            },
+            {
+                "Aktion": "INFLUENTIA",
+                "Datum": "2026-09-08",
+                "Einsatzstunden": 30,
+                "FIX": 6,
+                "Miliz": 0,
+            },
+        ])
+        generator = FakePlanGenerator({
+            "calculations": [
+                {"label": "Gesamt-Einsatzstunden", "aggregation": "sum", "column": "Einsatzstunden"},
+                {"label": "Gesamt-FIX", "aggregation": "sum", "column": "FIX"},
+                {"label": "Gesamt-Miliz", "aggregation": "sum", "column": "Miliz"},
+            ],
+        })
+
+        result = answer_table_question(
+            source,
+            "Wieviel Aufwand hatte Influentia im 2026?",
+            generator,
+            semantic_catalog=load_default_semantic_catalog(),
+        )
+
+        self.assertEqual(result.values, {"Gesamte Einsatzstunden": 77.5})
+        self.assertEqual(result.metadata["matched_rows"], 2)
+        self.assertEqual(generator.calls, [])
+
+    def test_quantity_word_does_not_override_an_average_request(self):
+        source = InMemoryTableSource([
+            {"Aktion": "INFLUENTIA", "Datum": "2026-09-04", "Einsatzstunden": 47.5},
+            {"Aktion": "INFLUENTIA", "Datum": "2026-09-08", "Einsatzstunden": 30},
+        ])
+        generator = FakePlanGenerator({
+            "filters": [
+                {"column": "Aktion", "op": "==", "value": "INFLUENTIA"},
+                {"column": "Datum", "op": ">=", "value": "2026-01-01"},
+                {"column": "Datum", "op": "<", "value": "2027-01-01"},
+            ],
+            "calculations": [{
+                "label": "Durchschnittliche Einsatzstunden",
+                "aggregation": "average",
+                "column": "Einsatzstunden",
+            }],
+        })
+
+        result = answer_table_question(
+            source,
+            "Wie viele Einsatzstunden waren durchschnittlich bei Influentia 2026?",
+            generator,
+            semantic_catalog=load_default_semantic_catalog(),
+        )
+
+        self.assertEqual(result.values, {"Durchschnittliche Einsatzstunden": 38.75})
+        self.assertEqual(len(generator.calls), 1)
+
     def test_empty_question_is_rejected_before_generator(self):
         source = InMemoryTableSource([{"Wert": 1}])
         generator = FakePlanGenerator({})
@@ -218,6 +431,7 @@ class AgentPlanningTests(unittest.TestCase):
         self.assertIn('Datum >= "2026-01-01"', prompt)
         self.assertIn("bedeutet max auf der Datumsspalte", prompt)
         self.assertIn("Datum und Aktionsname verbunden", prompt)
+        self.assertIn('Aktion == "Influentia", nicht', prompt)
         self.assertEqual(client.calls[0]["temperature"], 0.0)
 
 

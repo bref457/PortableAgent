@@ -100,7 +100,7 @@ class TableWorkflow:
                 ) from exc
             if clean_option not in {item.id for item in state.request.options}:
                 raise TableWorkflowError(
-                    "Die gewaehlte Tabellen-Rueckfrageoption ist ungueltig."
+                    "Die gewählte Tabellen-Rückfrageoption ist ungültig."
                 )
             del self._pending[clean_id]
 
@@ -145,5 +145,5 @@ def _nonempty_id(value: str, path: str) -> str:
         raise TableWorkflowError(f"{path} muss eine nicht leere Zeichenkette sein.")
     clean = value.strip()
     if len(clean) > 256 or "\x00" in clean:
-        raise TableWorkflowError(f"{path} ist ungueltig.")
+        raise TableWorkflowError(f"{path} ist ungültig.")
     return clean

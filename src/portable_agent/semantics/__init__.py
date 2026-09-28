@@ -10,9 +10,11 @@ from .catalog import (
 from .policy import (
     SemanticPolicyError,
     apply_semantic_policy,
+    attach_result_semantics,
+    normalize_semantic_filters,
     resolve_clarification,
 )
-from .temporal import build_temporal_extreme_plan
+from .temporal import build_explicit_total_plan, build_temporal_extreme_plan
 
 __all__ = [
     "CatalogValidationError",
@@ -20,8 +22,11 @@ __all__ = [
     "SemanticField",
     "SemanticPolicyError",
     "apply_semantic_policy",
+    "attach_result_semantics",
+    "build_explicit_total_plan",
     "build_temporal_extreme_plan",
     "load_default_semantic_catalog",
     "load_semantic_catalog",
+    "normalize_semantic_filters",
     "resolve_clarification",
 ]

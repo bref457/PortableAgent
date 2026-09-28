@@ -56,6 +56,42 @@ class TableEngineTests(unittest.TestCase):
         self.assertEqual([ref.row for ref in result.citations], [2, 3])
         self.assertEqual(result.metadata["returned_groups"], 1)
 
+    def test_maximum_cites_only_decisive_row(self):
+        plan = QueryPlan(
+            filters=(Filter("Aktion", "==", "ALPHA"),),
+            calculations=(Calculation("Maximum", "max", "Stunden"),),
+        )
+
+        result = execute_table_plan(self.source, plan)
+
+        self.assertEqual(result.values, {"Maximum": 7.5})
+        self.assertEqual(result.metadata["matched_rows"], 2)
+        self.assertEqual([ref.row for ref in result.citations], [2])
+
+    def test_equal_extreme_values_are_all_cited(self):
+        source = InMemoryTableSource([
+            {"Aktion": "ALPHA", "Stunden": 7.5},
+            {"Aktion": "ALPHA", "Stunden": 5.0},
+            {"Aktion": "ALPHA", "Stunden": 7.5},
+        ])
+        plan = QueryPlan(
+            calculations=(Calculation("Maximum", "max", "Stunden"),),
+        )
+
+        result = execute_table_plan(source, plan)
+
+        self.assertEqual([ref.row for ref in result.citations], [2, 4])
+
+    def test_grouped_maximum_cites_only_decisive_rows_per_group(self):
+        plan = QueryPlan(
+            calculations=(Calculation("Maximum", "max", "Stunden"),),
+            group_by="Aktion",
+        )
+
+        result = execute_table_plan(self.source, plan)
+
+        self.assertEqual([ref.row for ref in result.citations], [2, 4])
+
     def test_contains_is_case_insensitive(self):
         plan = QueryPlan(
             filters=(Filter("Aktion", "contains", "alp"),),
@@ -85,4 +121,3 @@ class TableEngineTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

@@ -158,7 +158,7 @@ class TableWorkflowTests(unittest.TestCase):
             )
             pending = workflow.ask_file(path, "Wie lange war der Einsatz?")
 
-            with self.assertRaisesRegex(TableWorkflowError, "ungueltig"):
+            with self.assertRaisesRegex(TableWorkflowError, "ungültig"):
                 workflow.resolve(pending.clarification_id, "median")
 
             self.assertEqual(workflow.pending_clarification_count, 1)

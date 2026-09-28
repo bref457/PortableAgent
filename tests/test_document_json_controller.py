@@ -72,7 +72,7 @@ class DocumentJsonControllerTests(unittest.TestCase):
 
     def test_malformed_duplicate_nonstandard_and_oversized_json_are_rejected(self):
         invalid = (
-            ('{"operation":', "Ungueltiger JSON"),
+            ('{"operation":', "Ungültiger JSON"),
             ('{"operation":"list_sessions","operation":"ask"}', "doppeltes Feld"),
             ('{"operation":"ask","session_id":"x","question":NaN}', "unzulaessig"),
         )
@@ -82,7 +82,7 @@ class DocumentJsonControllerTests(unittest.TestCase):
                     self.controller.handle_json(payload)
 
         limited = DocumentJsonController(self.workflow, max_request_chars=10)
-        with self.assertRaisesRegex(DocumentJsonError, "groesser als"):
+        with self.assertRaisesRegex(DocumentJsonError, "größer als"):
             limited.handle_json('{"operation":"list_sessions"}')
 
     def test_unknown_session_propagates_before_generator_call(self):

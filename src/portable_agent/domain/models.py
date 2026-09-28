@@ -44,6 +44,7 @@ class SourceRef:
     page: int | None = None
     paragraph: str | None = None
     excerpt: str | None = None
+    row_values: tuple[tuple[str, Any], ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

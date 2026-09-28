@@ -25,7 +25,8 @@ def execute_table_plan(source: TableSource, plan: QueryPlan) -> QueryResult:
             calculation.label: _calculate(matched, calculation)
             for calculation in plan.calculations
         }
-        citations = tuple(row.source_ref for row in matched)
+        cited_rows = _rows_supporting_result(matched, plan.calculations)
+        citations = tuple(row.source_ref for row in cited_rows)
         return QueryResult(
             values=values,
             citations=citations,
@@ -55,16 +56,22 @@ def execute_table_plan(source: TableSource, plan: QueryPlan) -> QueryResult:
             )
         except TypeError as exc:
             raise PlanExecutionError(
-                f"Werte fuer '{sort_rule.by}' sind nicht gemeinsam sortierbar."
+                f"Werte für '{sort_rule.by}' sind nicht gemeinsam sortierbar."
             ) from exc
     if plan.limit is not None:
         result_rows = result_rows[: plan.limit]
 
     included_groups = {item[plan.group_by] for item in result_rows}
+    cited_row_ids: set[int] = set()
+    for group in included_groups:
+        group_rows = tuple(
+            row for row in matched if row.values.get(plan.group_by) == group
+        )
+        cited_row_ids.update(
+            id(row) for row in _rows_supporting_result(group_rows, plan.calculations)
+        )
     citations = tuple(
-        row.source_ref
-        for row in matched
-        if row.values.get(plan.group_by) in included_groups
+        row.source_ref for row in matched if id(row) in cited_row_ids
     )
     return QueryResult(
         values={"groups": result_rows},
@@ -87,6 +94,35 @@ def _matches_all(row: TableRow, filters: Iterable[Filter]) -> bool:
     return all(_matches(row.values.get(item.column), item) for item in filters)
 
 
+def _rows_supporting_result(
+    rows: tuple[TableRow, ...],
+    calculations: tuple[Calculation, ...],
+) -> tuple[TableRow, ...]:
+    """Return only decisive rows when every calculation is min/max.
+
+    Sums, averages and counts depend on every matched row. Minima and maxima
+    are supported only by rows carrying the extreme value; equal ties are all
+    retained as evidence.
+    """
+    if not calculations or any(
+        item.aggregation not in {"min", "max"} or item.column is None
+        for item in calculations
+    ):
+        return rows
+    extremes = tuple(
+        (item.column, _calculate(rows, item))
+        for item in calculations
+    )
+    return tuple(
+        row
+        for row in rows
+        if any(
+            extreme is not None and row.values.get(column) == extreme
+            for column, extreme in extremes
+        )
+    )
+
+
 def _matches(actual: Any, item: Filter) -> bool:
     if item.op == "contains":
         return str(item.value).casefold() in str(actual or "").casefold()
@@ -105,9 +141,9 @@ def _matches(actual: Any, item: Filter) -> bool:
             return actual <= item.value
     except TypeError as exc:
         raise PlanExecutionError(
-            f"Filter '{item.column} {item.op}' ist fuer diese Werte nicht anwendbar."
+            f"Filter '{item.column} {item.op}' ist für diese Werte nicht anwendbar."
         ) from exc
-    raise PlanExecutionError(f"Nicht unterstuetzter Filteroperator: {item.op}")
+    raise PlanExecutionError(f"Nicht unterstützter Filteroperator: {item.op}")
 
 
 def _calculate(rows: Iterable[TableRow], calculation: Calculation) -> Any:
@@ -126,7 +162,7 @@ def _calculate(rows: Iterable[TableRow], calculation: Calculation) -> Any:
     if calculation.aggregation in {"sum", "average"}:
         if any(isinstance(value, bool) or not isinstance(value, Number) for value in values):
             raise PlanExecutionError(
-                f"'{calculation.label}' erwartet ausschliesslich numerische Werte."
+                f"'{calculation.label}' erwartet ausschließlich numerische Werte."
             )
         total = sum(values)
         return total if calculation.aggregation == "sum" else total / len(values)
@@ -138,10 +174,10 @@ def _calculate(rows: Iterable[TableRow], calculation: Calculation) -> Any:
             return max(values)
     except TypeError as exc:
         raise PlanExecutionError(
-            f"Werte fuer '{calculation.label}' sind nicht gemeinsam vergleichbar."
+            f"Werte für '{calculation.label}' sind nicht gemeinsam vergleichbar."
         ) from exc
     raise PlanExecutionError(
-        f"Nicht unterstuetzte Aggregation: {calculation.aggregation}"
+        f"Nicht unterstützte Aggregation: {calculation.aggregation}"
     )
 
 

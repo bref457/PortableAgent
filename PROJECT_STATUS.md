@@ -24,6 +24,14 @@ weder Laufzeitabhaengigkeit noch Bestandteil dieses Repositories.
 - strikt auf Loopback begrenzter HTTP-Server;
 - kontrollierter Start und Shutdown eines eigenen llama.cpp-Kindprozesses;
 - lokale Weboberflaeche fuer Dokumente, Tabellen und Memory;
+- fachgerechte Stunden-/Minutenanzeige fuer berechnete Dauern;
+- Uhrzeitanzeige fuer dezimale Beginn- und Endwerte in Tabellenbelegen;
+- sichtbare, lokal erzeugte Zellinhalte zu verwendeten Tabellenzeilen;
+- barrierearme Arbeitsanzeige mit reduziertem Bewegungsmodus;
+- kompakte Desktop-App-Shell mit einklappbarer Seitennavigation und
+  verschiebbarer Tabellenaufteilung;
+- lokale Normalisierung eindeutiger Textfilter und sichere Trennung von
+  Jahresangaben und Aktionsnamen;
 - portable Windows-Startdiagnose und relative Anwendungspfade;
 - synthetische Beispieltabellen und -dokumente unter `examples/synthetic/`.
 
@@ -43,7 +51,7 @@ weder Laufzeitabhaengigkeit noch Bestandteil dieses Repositories.
 
 ## Verifikation
 
-Alle **218 synthetischen Unit- und Integrationstests** laufen mit der
+Alle **230 synthetischen Unit- und Integrationstests** laufen mit der
 portablen Projektlaufzeit erfolgreich. `start.bat --check` bestaetigt die
 portable Runtime. Die Tests lesen keine externen Dateien und keine Nutzdaten.
 
@@ -84,6 +92,9 @@ Dokumentdaten wurden nicht uebernommen.
 - woechentliche Dependabot-Pruefung fuer Python- und Actions-Abhaengigkeiten;
 - oeffentliche GitHub-Veroeffentlichung ohne Runtime-, Modell- oder
   Nutzdatendateien.
+- Branch-Schutz fuer `main` mit Pull Request, den beiden synthetischen CI-
+  Checks und verpflichtender Conversation-Aufloesung; Administrator-Bypass
+  bleibt fuer die Einzelbetreuung aktiviert.
 
 ## Aktuelle Grenzen
 
@@ -100,25 +111,33 @@ Dokumentdaten wurden nicht uebernommen.
 ## Naechste Schritte
 
 1. physischen Portabilitaets-Smoke-Test durchfuehren;
-2. GitHub-Repository-Metadaten und Branch-Schutz nach erster erfolgreicher
-   CI-Ausfuehrung konfigurieren;
+2. GitHub-Repository-Metadaten (Beschreibung und Topics) speichern;
 3. private Vulnerability-Reporting-Funktion in GitHub pruefen;
 4. v0.1-Release erst nach abgeschlossenem Sicherheits- und Lizenzabgleich
    veroeffentlichen.
 
 ## Letzter abgeschlossener Entwicklungsschritt
 
-Die oeffentliche Repository-Basis wurde vervollstaendigt: Die README fuehrt
-kompakt von den Projektgrenzen ueber den Windows-Schnellstart bis zur Auswahl
-eigener Dateien. Geraetespezifische Referenzpfade wurden aus der oeffentlichen
-Dokumentation entfernt. `CONTRIBUTING.md`, strukturierte Issue-Vorlagen und eine
-Pull-Request-Checkliste verhindern insbesondere das versehentliche Hochladen
-echter Nutzdaten. Paket-Metadaten enthalten nun Projektlinks, Status,
-Python-Versionen und Suchbegriffe.
-
-GitHub Actions prueft die synthetische Testsuite unter Python 3.11 und 3.13;
-Dependabot beobachtet Python- und Workflow-Abhaengigkeiten. Lokal liefen alle
-218 synthetischen Tests sowie `start.bat --check` erfolgreich. Runtime, Modell,
-persistentes Memory, temporaere Sitzungen, Nutzdaten und Python-Caches bleiben
-von Git ausgeschlossen.
-
+Die lokale Weboberflaeche ist als kompakter Desktop-Arbeitsbereich mit
+einklappbarer Navigation aufgebaut. Dokument- und Tabellenansicht besitzen
+nun beide einen verschiebbaren, tastaturbedienbaren Trenner. Tabellenbelege
+zeigen die verwendeten Zeileninhalte mit semantisch formatierten Dauern und
+Uhrzeiten. Dabei ist nur die erste verwendete Zeile anfangs geöffnet; weitere
+Zeilen lassen sich bei Bedarf einzeln aufklappen. Die Tabellenansicht verzichtet
+auf einen redundanten Ergebnisplatzhalter und verwendet für die Dateiauswahl
+denselben primaeren Schaltflaechenstil wie die übrigen Importbereiche.
+Modell- und KI-Dateistatus stehen kompakt und einzeilig im unteren Bereich der
+Navigation; im eingeklappten Zustand sind ihre Statuspunkte exakt ausgerichtet.
+Das kompakte Markenkennzeichen lautet `PA`. Die obere Leiste bleibt dadurch auf
+Kontext und Beenden reduziert. Sichtbare deutsche Meldungen verwenden echte
+Umlaute. Bei Minimum und Maximum werden nur die entscheidenden Belegzeilen
+ausgegeben, einschließlich aller Gleichstände; Summe und Durchschnitt behalten
+alle beitragenden Zeilen.
+Eindeutige Fragen nach der Gesamtdauer einer konkret genannten
+Aktion in einem Jahr werden lokal deterministisch geplant. Natürliche
+Mengenfragen wie `Wieviel Aufwand hatte …?` verwenden den fachlichen
+Katalogalias und liefern nur die erfragte Kennzahl, statt zusätzliche
+Personalwerte zu summieren. Abweichende Absichten wie Durchschnitt, Minimum
+oder Maximum bleiben getrennt. Zellwerte werden dabei nicht an das Modell
+weitergegeben. Die vollständige synthetische Testsuite umfasst jetzt 230
+erfolgreiche Tests.

@@ -45,4 +45,3 @@ Sie duerfen keine externen Dateien oder Nutzdaten lesen.
 
 Mit einem Beitrag erklaerst du dich damit einverstanden, dass er unter der
 Apache License 2.0 veroeffentlicht wird.
-

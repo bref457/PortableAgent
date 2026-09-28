@@ -23,7 +23,7 @@ _REQUIRED_FIELD_FIELDS = frozenset({
     "canonical_name", "aliases", "role", "data_type", "description"
 })
 _ROLES = frozenset({"dimension", "measure", "text"})
-_DATA_TYPES = frozenset({"text", "date", "number", "duration"})
+_DATA_TYPES = frozenset({"text", "date", "time", "number", "duration"})
 _OPERATIONS = frozenset({"filter", "group", "distinct", "count", "list", "min", "max"})
 _AGGREGATIONS = frozenset({"sum", "average", "min", "max", "count"})
 
@@ -218,4 +218,3 @@ def _string_choices(value: Any, choices: frozenset[str], path: str) -> tuple[str
         _choice(item, choices, f"{path}[{index}]")
         for index, item in enumerate(_list(value, path))
     )
-

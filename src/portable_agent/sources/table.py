@@ -67,6 +67,7 @@ class InMemoryTableSource:
                     display_name=display_name,
                     section=section,
                     row=row_number,
+                    row_values=tuple(row.items()),
                 ),
             )
             for row, row_number in zip(snapshots, numbers, strict=True)

@@ -62,7 +62,7 @@ def search_document(
         return RetrievalResult(
             query=query.strip(),
             matches=(),
-            message="Die Frage enthaelt keine lokal suchbaren Begriffe.",
+            message="Die Frage enthält keine lokal suchbaren Begriffe.",
         )
     phrase = " ".join(query_terms)
     ranked: list[RetrievalMatch] = []
