@@ -7,7 +7,7 @@ Unterordner.
 
 Wenn der Benutzer `update dich` schreibt, vor allen anderen Arbeiten:
 
-1. `README.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `SPEC.md` und
+1. `CLAUDE.md`, `README.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `SPEC.md` und
    `SKILL_RESEARCH.md` vollstaendig lesen.
 2. Den aktuellen Git-Status, den aktiven Branch und die letzten Commits
    pruefen.
@@ -22,9 +22,10 @@ passt, die Abweichung deutlich nennen und nicht eigenmaechtig korrigieren.
 Wenn der Benutzer `save` schreibt:
 
 1. Die aktuellen Aenderungen und ihren dokumentierten Projektstand pruefen.
-2. `README.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `SPEC.md` und
+2. `CLAUDE.md`, `README.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `SPEC.md` und
    `SKILL_RESEARCH.md` nur dort aktualisieren, wo neue Funktionen, Grenzen,
-   Testergebnisse oder naechste Schritte den Inhalt tatsaechlich veraendern.
+   agentenspezifische Hinweise, Testergebnisse oder naechste Schritte den
+   Inhalt tatsaechlich veraendern.
 3. Angemessene synthetische Tests und die portable Startpruefung ausfuehren.
 4. Vor dem Speichern sicherstellen, dass keine Runtime, Modelle, Memory,
    Sitzungs- oder Nutzdaten aufgenommen werden.
@@ -71,6 +72,15 @@ Wenn der Benutzer `save` schreibt:
 
 ## Entwicklung
 
+- `AGENTS.md` ist die gemeinsame, massgebliche Regelquelle fuer Codex, Claude
+  Code und andere Coding Agents. `CLAUDE.md` importiert diese Regeln und
+  enthaelt nur Claude-spezifische Ergaenzungen.
+- Wichtige Anweisungen, Architekturentscheidungen, Fortschritte, Grenzen und
+  naechste Schritte immer in den passenden versionierten Projektdateien
+  festhalten. Niemals nur auf einen Chatverlauf oder agentenspezifisches Auto
+  Memory vertrauen.
+- Gemeinsame Regeln in `AGENTS.md` aendern. Claude-spezifische Hinweise duerfen
+  zusaetzlich in `CLAUDE.md` stehen; widerspruechliche Doppelungen vermeiden.
 - Subagents verwenden, wenn Aufgaben sinnvoll voneinander trennbar sind und
   dadurch voraussichtlich Zeit oder Credits gespart werden. Bei kleinen oder
   stark zusammenhaengenden Aenderungen ohne Subagents weiterarbeiten.
