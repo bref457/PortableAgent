@@ -20,7 +20,7 @@ classifiers = [
 ]
 dependencies = [
     "openpyxl>=3.1,<4",
-    "pypdf>=5,<7",
+    "pypdf>=5,<8",
 ]
 
 [project.scripts]
